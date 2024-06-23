@@ -442,7 +442,7 @@ public class Compilador extends javax.swing.JFrame {
         ArrayList<Production> identValor = new ArrayList<>();
         ArrayList<Production> idSValor = new ArrayList<>();
         ArrayList<Production> mets = new ArrayList<>();
-        ArrayList<Production> listas = new ArrayList<>();
+        ArrayList<Production> vectores = new ArrayList<>();
 
         //Eliminacin de errores Lexicos
         gramatica.delete("ERROR", 1, "Error léxico ({}): En la línea #, Cadena inválida");
@@ -503,31 +503,31 @@ public class Compilador extends javax.swing.JFrame {
         //******* VECTORES **********************
         
         
-        gramatica.group("DeclaracionVect", "VECT TipoDato Identificador Corch_abr Numero Corch_cer ",listas);
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr Numero Corch_cer ",vectores);
        
-        gramatica.group("DeclaracionVect", "VECT TipoDato Identificador Op_asignacion Corch_abr"
-                + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ",listas); 
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Op_asignacion Corch_abr"
+                + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ",vectores); 
         
         
                 
             //Errores
-          gramatica.group("DeclaracionVect", " VECT TipoDato Identificador Op_asignacion  Corch_abr (Corch_abr)+"
+          gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion  Corch_abr (Corch_abr)+"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)* (Corch_cer)+", 51,
                 "Error sintáctico (51): En la línea #, Existen corchetes de más.");
         
-         gramatica.group("DeclaracionVect", " VECT TipoDato Identificador Op_asignacion (Corch_abr)+ "
+         gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion (Corch_abr)+ "
                 + " ((Valor | Numero) | (Valor | Numero) Coma)* Corch_cer Corch_cer (Corch_cer)+", 51,
                 "Error sintáctico (51): En la línea #, Existen corchetes de más.");  
          
-         gramatica.group("DeclaracionVect", " VECT TipoDato Identificador (Op_Adisi|Op_Multi|OpRel|OpLog) (Corch_abr)+"
+         gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador (Op_Adisi|Op_Multi|OpRel|OpLog) (Corch_abr)+"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)* (Corch_cer)+", 52,
                 "Error sintáctico (52): En la línea #, Operador invalido para la asignación.");
         
         
-        gramatica.group("DeclaracionVect", "VECT TipoDato (Corch_abr)+ Corch_cer ", 12,
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato (Corch_abr)+ Corch_cer ", 12,
                 "Error sintáctico (15): En la línea #, Falta un identificador en la declaración.");
         
-        gramatica.group("DeclaracionVect", " VECT TipoDato  Op_asignacion (Corch_abr)+"
+        gramatica.group("DeclaracionVect", " VECTOR TipoDato  Op_asignacion (Corch_abr)+"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)+ (Corch_cer)+ ",15,
                 "Error sintáctico (16): En la línea #, Falta palabra clave para poder declarar.");
         
@@ -538,11 +538,11 @@ public class Compilador extends javax.swing.JFrame {
                 + " ((Valor | Numero) | (Valor | Numero) Coma)+ (Corch_cer)+ ", 15,
                 "Error sintáctico (16): En la línea #, Falta palabra clave para poder declarar.");
 
-        gramatica.group("DeclaracionVect", "VECT TipoDato Identificador Op_asignacion (Corch_abr)+"
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Op_asignacion (Corch_abr)+"
                 + " (Coma)+ Corch_cer ", 16,
                 "Error sintáctico (26): En la línea #, Faltan por asignar valores en la lista");
 
-        gramatica.group("DeclaracionVect", "VECT TipoDato Identificador Op_asignacion (Corch_abr)+"
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Op_asignacion (Corch_abr)+"
                 + " ((Valor | Numero) Coma)+ (Corch_cer)+", 16,
                 "Error sintáctico (26): En la línea #, Faltan por asignar valores en la lista");
         gramatica.finalLineColumn();
@@ -649,7 +649,7 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("MetodoEstatique", "MetodoSP  Par_cer Punto_coma",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
         
-        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer Punto_coma");
+        //gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer Punto_coma");
         
         gramatica.group("MetodoEstatique", "Identificador (Par_abr)+ Par_cer (Par_cer)+ Punto_coma",49,
                 "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
@@ -674,7 +674,7 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("MetodoEstatique", "MetodoSP Par_abr Par_cer ",11,
                     "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
         
-        //gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Parametros",mets);
+        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Parametros",mets);
         gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Par_abr Par_cer",mets);
                          
 //        gramatica.group("DeclaracionMetodo", "Identificador Parametros ",44,
@@ -1168,12 +1168,12 @@ public class Compilador extends javax.swing.JFrame {
         //si es coomo dices mirA
        
        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-        gramatica.group("EstPrincipal", "PRINCIPAL Llav_abr (Sentencias|DeclaracionesF)* Llav_cer");
+        //gramatica.group("EstPrincipal", "PRINCIPAL Llav_abr (Sentencias|DeclaracionesF)* Llav_cer");
         
          gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo Llav_abr (Sentencias | DeclaracionesF)* Llav_cer");
         
-        gramatica.group("EstPrincipal", " Llav_abr (Sentencias|DeclaracionesF)* Llav_cer",
-                36, "Error sintáctico (36): En la línea #, Falta palabra clave PRINCIPAL.");
+        //gramatica.group("EstPrincipal", " Llav_abr (Sentencias|DeclaracionesF)* Llav_cer",
+                //36, "Error sintáctico (36): En la línea #, Falta palabra clave PRINCIPAL.");
         
         //errores llaves metodos
         gramatica.finalLineColumn(); 
@@ -1183,10 +1183,10 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo  (Sentencias)* Llav_cer ",
                 34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
         
-        gramatica.group("EstPrincipal", "PRINCIPAL Llav_abr (DeclaracionMetodoSentencias)* Llav_cer",
-                40, "Error sintáctico (40): En la línea #, No se pueden declarar metodos dentro de PRINCIPAL.");
+//        gramatica.group("EstPrincipal", "PRINCIPAL Llav_abr (DeclaracionMetodoSentencias)* Llav_cer",
+//                40, "Error sintáctico (40): En la línea #, No se pueden declarar metodos dentro de PRINCIPAL.");
         
-        gramatica.group("CuerpoClase", "(EstPrincipal | DeclaracionMetodoSentencias)+");
+        gramatica.group("CuerpoClase", "(DeclaracionMetodoSentencias)+");
         gramatica.group("CuerpoClases", "(CuerpoClase| CuerpoClase CuerpoClases)+");
         });
         
@@ -1216,7 +1216,7 @@ public class Compilador extends javax.swing.JFrame {
 
         valoresIdent(identValor,idSValor);
         defineMetodos(mets);
-        meterListass(listas);
+        meterListass(vectores);
 
         gramatica.show();
     }
@@ -1320,7 +1320,7 @@ public class Compilador extends javax.swing.JFrame {
    private void meterListass(ArrayList<Production> list) {
     for (Production l : list) {
         String nom = l.lexemeRank(2);
-        StringBuilder valBuilder = new StringBuilder(); // LISTA0 TD1 ID2 =3 [4 val5];
+        StringBuilder valBuilder = new StringBuilder(); // VECT0 TD1 ID2 =3 [4 val5];VECT0 TD1 id2 [3 N4 ]5
         int x = 5;
         while (!l.lexemeRank(x).equals("]")) {
             valBuilder.append(l.lexemeRank(x)).append(" ");
