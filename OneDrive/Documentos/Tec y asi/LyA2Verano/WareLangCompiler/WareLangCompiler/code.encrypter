@@ -1,0 +1,17 @@
+CLASE prueba{
+CONF ENT x;
+CONF FREC zz = 20;
+LISTA COLOR c = [];
+LISTA DEC listV = [1,2,3];
+CONF ENT y;
+CONF FREC zz3 = 20;
+
+DEF metodo(){
+   TOMAR();
+}
+
+DEF metodo2(ENT p,ENT z){
+   SOLTAR();
+}
+
+}
