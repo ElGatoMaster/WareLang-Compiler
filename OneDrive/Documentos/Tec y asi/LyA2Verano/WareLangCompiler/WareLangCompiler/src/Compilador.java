@@ -651,14 +651,14 @@ public class Compilador extends javax.swing.JFrame {
         
         //gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer Punto_coma");
         
-        gramatica.group("MetodoEstatique", "Identificador (Par_abr)+ Par_cer (Par_cer)+ Punto_coma",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("MetodoEstatique", "Identificador ((Par_abr)+ Par_abr (Par_cer)+ Punto_coma",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer",11,
-                    "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
+//        gramatica.group("MetodoEstatique", "Identificador (Par_abr)+ Par_cer (Par_cer)+ Punto_coma",49,
+//                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+//        
+//        gramatica.group("MetodoEstatique", "Identificador ((Par_abr)+ Par_abr (Par_cer)+ Punto_coma",49,
+//                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+//        
+//        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer",11,
+//                    "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
         
         gramatica.group("MetodoEstatique", "Identificador Par_abr ((Identificador|Valor|Numero) (Coma (Identificador|Valor|Numero))*) Par_cer Punto_coma"); 
         

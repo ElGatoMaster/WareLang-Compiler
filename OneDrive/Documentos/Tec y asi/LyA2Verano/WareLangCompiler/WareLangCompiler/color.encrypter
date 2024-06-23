@@ -10,4 +10,8 @@ DEF metodo2(ENT p,ENT z){
    SOLTAR();
 }
 
+DEF metodoSP(){
+   ADELANTE(1,1);
+}
+
 }
