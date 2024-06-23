@@ -1288,6 +1288,12 @@ public class Compilador extends javax.swing.JFrame {
             } else if (param.startsWith("COLOR")) {
                 colorParams.add(param);
             }
+            for(var s: simbolos){
+                if(param.endsWith(s[0])){
+                    simbolos.remove(simbolos.indexOf(s));
+                    break;
+                }
+            }
         }
 
         // Combina los parámetros ordenados
@@ -1300,6 +1306,8 @@ public class Compilador extends javax.swing.JFrame {
         sortedParams.addAll(frecParams);
         sortedParams.addAll(colorParams);
 
+        //List<Integer> acum = new ArrayList<>();
+        
         for (var s : simbolos) {
             if (s[0].equals(nom)) {
                 String[] metodo = new String[1 + sortedParams.size()];
@@ -1307,6 +1315,7 @@ public class Compilador extends javax.swing.JFrame {
 
                 for (int j = 0; j < sortedParams.size(); j++) {
                     metodo[1 + j] = sortedParams.get(j);
+                    
                 }
 
                 metodos.add(metodo);
@@ -1314,6 +1323,9 @@ public class Compilador extends javax.swing.JFrame {
                 break;
             }
         }
+        
+        
+        
     }
 }
     
