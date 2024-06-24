@@ -649,17 +649,23 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("MetodoEstatique", "MetodoSP  Par_cer Punto_coma",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
         
-        //gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer Punto_coma");
+        //DECLARACION DE METODOS de usuario
+        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Parametros",mets);
+        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Par_abr Par_cer",mets);
         
-//        gramatica.group("MetodoEstatique", "Identificador (Par_abr)+ Par_cer (Par_cer)+ Punto_coma",49,
-//                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-//        
-//        gramatica.group("MetodoEstatique", "Identificador ((Par_abr)+ Par_abr (Par_cer)+ Punto_coma",49,
-//                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-//        
-//        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer",11,
-//                    "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
+        //LLAMADA A METODOS SIN PARAMETROS
+        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer Punto_coma");
         
+        gramatica.group("MetodoEstatique", "Identificador (Par_abr)+ Par_cer (Par_cer)+ Punto_coma",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("MetodoEstatique", "Identificador ((Par_abr)+ Par_abr (Par_cer)+ Punto_coma",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer",11,
+                    "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
+        
+        //LLAMADA A METODOS CON PARAMETROS
         gramatica.group("MetodoEstatique", "Identificador Par_abr ((Identificador|Valor|Numero) (Coma (Identificador|Valor|Numero))*) Par_cer Punto_coma"); 
         
         gramatica.group("MetodoEstatique", "Identificador Par_abr ((Identificador|Valor|Numero) (Coma (Identificador|Valor|Numero))*) Par_cer ",11,
@@ -674,11 +680,10 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("MetodoEstatique", "MetodoSP Par_abr Par_cer ",11,
                     "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
         
-        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Parametros",mets);
-        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Par_abr Par_cer",mets);
+        
                          
-//        gramatica.group("DeclaracionMetodo", "Identificador Parametros ",44,
-//                "Error sintáctico (44): En la línea #, Falta palabra clave para definir método.");
+        gramatica.group("DeclaracionMetodo", "Identificador Parametros ",44,
+                "Error sintáctico (44): En la línea #, Falta palabra clave para definir método.");
         
         gramatica.group("DeclaracionMetodo", "Identificador Par_abr Par_cer",44,
                 "Error sintáctico (44): En la línea #, Falta palabra clave para definir método.");
@@ -696,62 +701,7 @@ public class Compilador extends javax.swing.JFrame {
          gramatica.group("ERRORES", "(ERROR_1 | ERROR_7) Par_abr Par_cer Punto_coma",49,
                 "Error sintáctico (49): En la línea #, Falta palabra reservada"); 
         
-         
-         /******************************   lista SACAR  ***********************
-        gramatica.group("metListaSacar", "Identificador Punto F_Sacar Par_abr (Numero | Identificador)? Par_cer");
         
-        gramatica.group("metListaSacar", "Identificador Punto F_Sacar (Par_abr)+ (Numero | Identificador)? Par_cer (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("metListaSacar", "Identificador Punto F_Sacar (Par_abr)+ Par_abr (Numero | Identificador)? (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("metListaSacar", "F_Sacar",19,
-                "Error sintáctico (19): En la línea #, Estructura inválidadel método.");
-        
-        gramatica.group("metListaSacar", "Identificador Punto  Par_abr (Numero | Identificador)? Par_cer",19,
-                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-               
-        gramatica.group("metListaSacar", "Identificador Punto F_Sacar Par_abr (Numero | Identificador)?",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        gramatica.group("metListaSacar", "Identificador Punto F_Sacar  (Numero | Identificador)? Par_cer",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        gramatica.finalLineColumn(); */
-        
-         
-        /******************************   lista agreggar  ***********************
-        gramatica.group("metListaAgre", "Identificador Punto F_AGREGAR Par_abr (Numero | Identificador | Valor) Par_cer ");
-        
-         gramatica.group("metListaAgre", "Identificador Punto F_AGREGAR  (Par_abr)+ (Numero | Identificador)? Par_cer (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("metListaAgre", "Identificador Punto F_AGREGAR  (Par_abr)+ Par_abr (Numero | Identificador)? (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("metListaAgre", "Identificador Punto F_AGREGAR Par_abr Par_cer ",20,
-                "Error sintáctico (23): En la línea #, Falta un valor en método.");
-   
-        gramatica.group("metListaAgre", "Identificador Punto ",28,
-                "Error sintáctico (28): En la línea #, Falta palabra clave.");  
-        
-        gramatica.group("metListaAgre", "Identificador Punto F_AGREGAR Par_abr (Numero | Identificador | Valor) ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        gramatica.group("metListaAgre", "Identificador Punto F_AGREGAR  (Numero | Identificador | Valor) Par_cer ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        gramatica.group("metListaAgre", "Identificador Punto F_AGREGAR",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        gramatica.group("metListaAgre", "Identificador Punto Par_abr (Numero | Identificador | Valor) Par_cer  ",28,
-                "Error sintáctico (28): En la línea #, Falta palabra clave.");
-           
-        gramatica.finalLineColumn();*/
-        
-        
-                
-               
         
         //******************* EST CAJA **********************
       
@@ -809,52 +759,8 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador | Numero)  ", 18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
         
-        
         gramatica.finalLineColumn();
-         
-         
-         
-        /******************************METODOS IMPRM***********************
-        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor|metListaSacar) Coma OpImpr Par_cer");
-        
-            gramatica.group("EstImpr", "F_IMPR ",19,
-                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-        
-        gramatica.group("EstRevisar", "F_IMPR Par_abr (Valor|metListaSacar) (Coma)+ OpImpr Par_cer",55,
-                    "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas de más");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Numero Coma OpImpr Par_cer",32,
-                "Error sintáctico (32): En la línea #, No se permite un numero como mensaje a imprimir.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Par_cer",20,
-                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
-
-        gramatica.group("EstImpr", "F_IMPR  (Par_abr)+ (Valor|metListaSacar) Coma OpImpr Par_cer (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("EstImpr", "F_IMPR (Par_abr)+ Par_abr (Valor|metListaSacar) Coma OpImpr (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Coma Par_cer",20,
-                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma Par_cer",30,
-                "Error sintáctico (30): En la línea #, Falta donde se imprimirá el mensaje.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Coma OpImpr Par_cer",31,
-                "Error sintáctico (31): En la línea #, Falta mensaje a imprimir.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma OpImpr ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-         gramatica.group("EstImpr", "F_IMPR Valor Coma OpImpr Par_cer ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        
-         gramatica.finalLineColumn(); */
-         
-         
+       
 
         //******************************METODOS REVISAR***********************
         gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador) Coma (Identificador | Numero) Par_cer");
@@ -951,41 +857,6 @@ public class Compilador extends javax.swing.JFrame {
         
         
         
-        
-        /******************************   lista cantidad   ***********************
-        gramatica.group("metListaRet", "Identificador Punto F_CANTIDAD Par_abr Par_cer ");
-        
-        gramatica.group("metListaRet", "Identificador Punto F_CANTIDAD Par_cer ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-         gramatica.group("metListaRet", "Identificador Punto F_CANTIDAD (Par_abr)+ (Par_cer)+",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("metListaRet", "Identificador Punto F_CANTIDAD Par_abr",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        gramatica.group("metListaRet", "Identificador Punto F_CANTIDAD",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        gramatica.group("metListaRet", "Identificador Punto Par_abr Par_cer ",28,
-                "Error sintáctico (28): En la línea #, Falta palabra clave.");
-        
-        gramatica.group("metListaRet", "Identificador  F_CANTIDAD Par_abr Par_cer ",19,
-                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-        
-        gramatica.group("metListaRet", "Identificador Punto ",28,
-                "Error sintáctico (28): En la línea #, Falta palabra clave.");      
-        gramatica.finalLineColumn();*/
-        
-       
-        
-        
-
-     
-        
-        
-        
-        
         //*********************** MÉTODOS ESTATICOS**************************
        
 //        gramatica.group("MetodoEstatique", "(F_SOLTAR | F_APAGAR | F_PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR )"
@@ -1029,9 +900,10 @@ public class Compilador extends javax.swing.JFrame {
                 "Error sintáctico (16): En la línea #, Falta palabra clave.");
         gramatica.finalLineColumn();
         
-       
-         gramatica.group("LlamadaCond", "(EstRevisar | F_MOV | "
-                    + " EstAlarma | EstCaja)");
+        gramatica.group("EstVER","(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_abr Par_cer");
+        
+        gramatica.group("LlamadaCond", "(EstRevisar | F_MOV | "
+                    + " EstAlarma | EstCaja | EstVER)");
   
         
          
@@ -1104,6 +976,8 @@ public class Compilador extends javax.swing.JFrame {
         //****************** ESTRUCTURA SIII *********
         gramatica.group("EstSi", "Est_SI Par_abr ExpLog Par_cer");
         
+        
+        
         gramatica.group("EstSi", "Est_SI  (Par_abr)+  ExpLog  Par_cer (Par_cer)+(Par_cer Par_cer Par_cer Par_cer)?",48,
                 "Error sintáctico (48): En la línea #, Existen paréntesis de más.");
         
@@ -1119,6 +993,7 @@ public class Compilador extends javax.swing.JFrame {
                               
         gramatica.group("EstSi", "Est_SI Par_abr  ar_cer",39,
                 "Advertencia (39): En la línea #, No existe condición a evaluar.");
+        
         gramatica.finalLineColumn();
         
         
@@ -1140,6 +1015,10 @@ public class Compilador extends javax.swing.JFrame {
                               
         gramatica.group("EstMientras", "Est_MIENTRAS Par_abr  Par_cer",39,
                 "Advertencia (39): En la línea #, No existe condición a evaluar.");
+        
+        //ERROR PARA ESTRUCTURAS CONDICIONALES
+        gramatica.group("EstSi", "(ERROR_1 |ERROR_7)* Par_abr ExpLog Par_cer",50,
+                "Error sintáctico (50): En la línea #, Falta palabra reservada");
 
         
 //       gramatica.group("MetodoagregarPuntocoma", "metListaAgre Punto_coma");

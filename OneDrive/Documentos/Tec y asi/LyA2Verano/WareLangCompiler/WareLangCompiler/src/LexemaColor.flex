@@ -31,7 +31,7 @@ Identificador = {LetraMin}({Letra}|{Digito}){1,29}
 TipoDato = FREC | ENT | COLOR | DEC | BOOL | CAD | CONF| MINI | VECT 
 Est_PalReservadas = SI | SINO | MIENTRAS | REPETIR | RETORNA | CLASE | DEF |CONSOL | LEER | ESCRIB | APAGAR |  LCD  | PRENDER  | PRINCIPAL
 Funciones = ATRAS | IZQUIERDA | DERECHA | ALARMA | REVISAR | ADELANTE | CAJA
-            | SOLTAR | PARAR | LIMPIAR | TOMAR | VER
+            | SOLTAR | PARAR | LIMPIAR | TOMAR | VER | VERADELANTE | VERIZQUIERDA | VERDERECHA | VERATRAS
 
 /* Número */
 Numero = ([-+]?[1-9]([0-9])*) | 0
