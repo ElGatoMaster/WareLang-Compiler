@@ -683,8 +683,8 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("DeclaracionMetodo", "Identificador Par_abr Par_cer",44,
                 "Error sintáctico (44): En la línea #, Falta palabra clave para definir método.");
         
-//        gramatica.group("DeclaracionMetodo", "DEF  Parametros",45,
-//                "Error sintáctico (45): En la línea #, Falta nombre del método.");
+        gramatica.group("DeclaracionMetodo", "DEF  Parametros",45,
+                "Error sintáctico (45): En la línea #, Falta nombre del método.");
         
         gramatica.group("DeclaracionMetodo", "DEF  Par_abr Par_cer",45,
                 "Error sintáctico (45): En la línea #, Falta nombre del método.");
@@ -1102,10 +1102,10 @@ public class Compilador extends javax.swing.JFrame {
         
          //////// !!!!!!!!!!!!!!!! FALTANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
         //****************** ESTRUCTURA SIII *********
+        gramatica.group("EstSi", "Est_SI Par_abr ExpLog Par_cer");
+        
         gramatica.group("EstSi", "Est_SI  (Par_abr)+  ExpLog  Par_cer (Par_cer)+(Par_cer Par_cer Par_cer Par_cer)?",48,
                 "Error sintáctico (48): En la línea #, Existen paréntesis de más.");
-        
-        gramatica.group("EstSi", "Est_SI Par_abr ExpLog Par_cer");
         
         gramatica.group("EstSi", "Est_SI  Par_abr (Par_abr)+ ExpLog (Par_cer)+",48,
                 "Error sintáctico (48): En la línea #,Existen paréntesis de más.");   
@@ -1186,8 +1186,8 @@ public class Compilador extends javax.swing.JFrame {
 //        gramatica.group("EstPrincipal", "PRINCIPAL Llav_abr (DeclaracionMetodoSentencias)* Llav_cer",
 //                40, "Error sintáctico (40): En la línea #, No se pueden declarar metodos dentro de PRINCIPAL.");
         
-        gramatica.group("CuerpoClase", "(DeclaracionMetodoSentencias)+");
-        gramatica.group("CuerpoClases", "(CuerpoClase| CuerpoClase CuerpoClases)+");
+        gramatica.group("CuerpoClase", "(DeclaracionMetodoSentencias | Sentencias | DeclaracionesF)+");
+        gramatica.group("CuerpoClases", "(CuerpoClase| CuerpoClase CuerpoClases)");
         });
         
         
