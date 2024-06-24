@@ -22,7 +22,8 @@ import compilerTools.Token;
     "FREC", "ENT", "COLOR", "DEC", "BOOL", "CAD", "SI", "SINO", "MIENTRAS", 
     "REPETIR", "CLASE", "DEF", "CONSOL", "ESCRIB", "APAGAR", "LCD", 
     "PRENDER", "IMPR", "ATRAS", "IZQUIERDA", "DERECHA", "ALARMA", "REVISAR", 
-    "ADELANTE", "CAJA", "SOLTAR", "PARAR", "LIMPIAR", "TOMAR", "VER", "VECT"
+    "ADELANTE", "CAJA", "SOLTAR", "PARAR", "LIMPIAR", "TOMAR", "VECT",
+    "VERADELANTE","VERATRAS","VERIZQUIERDA","VERDERECHA"
     ));
 %}
 
@@ -136,6 +137,10 @@ PRINCIPAL  { return token(yytext(), "PRINCIPAL", yyline, yycolumn); }
 TOMAR  { return token(yytext(), "F_TOMAR", yyline, yycolumn); }
 CONF  { return token(yytext(), "CONF", yyline, yycolumn); }
 VECT { return token(yytext(), "VECTOR", yyline, yycolumn); }
+VERADELANTE { return token(yytext(), "VerAdelante", yyline, yycolumn); }
+VERATRAS { return token(yytext(), "VerAtras", yyline, yycolumn); }
+VERIZQUIERDA { return token(yytext(), "VerIzquierda", yyline, yycolumn); }
+VERDERECHA { return token(yytext(), "VerDerecha", yyline, yycolumn); }
 /*MATRIZ { return token(yytext(), "MATRIZ", yyline, yycolumn); }*/
 
 

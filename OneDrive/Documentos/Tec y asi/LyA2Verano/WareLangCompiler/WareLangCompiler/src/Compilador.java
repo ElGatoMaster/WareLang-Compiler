@@ -264,7 +264,7 @@ public class Compilador extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem1);
 
-        jMenuItem3.setText("Listas");
+        jMenuItem3.setText("Vectores");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem3ActionPerformed(evt);
@@ -1207,10 +1207,10 @@ public class Compilador extends javax.swing.JFrame {
                 36, "Error sintáctico (36): En la línea #, Falta palabra clave CLASE.");
               
 
-         gramatica.finalLineColumn(); 
-                 gramatica.group("EstClase", "CLASE (Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)*",
+        gramatica.finalLineColumn(); 
+        gramatica.group("EstClase", "CLASE (Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)*",
                 34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
-        
+
       
 
 
