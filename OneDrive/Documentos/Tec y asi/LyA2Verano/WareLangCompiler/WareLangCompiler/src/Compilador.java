@@ -910,7 +910,7 @@ public class Compilador extends javax.swing.JFrame {
                       //   ASIGNACIOON SI IGUAL
        gramatica.group("Asignacion", "(Identificador) Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma");         
        gramatica.group("Asignacion", "(Expresion|Identificador) Op_Asign (Expresion|Identificador|Numero) Punto_coma");
-         
+       gramatica.group("Asignacion", "(Identificador)Corch_abr (Identificador|Numero)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma");
          
         
 //        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
@@ -967,6 +967,21 @@ public class Compilador extends javax.swing.JFrame {
         
        gramatica.group("Asignacion", "(Expresion|Identificador) Op_Asign Punto_coma ",41,
                     "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
+       
+       gramatica.group("Asignacion", "(Identificador)Corch_abr (Identificador|Numero)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) ",11,
+               "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
+       
+       gramatica.group("Asignacion", "(Identificador) Corch_abr (Identificador|Numero)Corch_cer Op_asignacion Punto_coma",41,
+               "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) (Corch_abr) Asignacion",51,
+               "Error sintáctico (51): En la línea #, Falta abrir o cerrar corchetes");
+       gramatica.group("Asignacion", "(Expresion|Identificador)  (Expresion|Identificador|Numero)(Corch_cer) Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma",51,
+               "Error sintáctico (51): En la línea #, Falta abrir o cerrar corchetes");
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma",52,
+               "Error sintáctico (52): En la línea #, Falta el indice del arreglo");
+       
        
        gramatica.finalLineColumn();
             

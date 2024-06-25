@@ -10,7 +10,7 @@ CONF MINI cont = 0;
 //DECLARACION METODOS
 DEF metodoSP(){
    SI(REVISAR(#000000,12)==VERDADERO){
-      //buscados[cont] = 'producto1';
+      buscados[cont] = 'producto1';
       encontrado = VERDADERO;
       ALARMA(alarm);
       avanzarConCuidado();
