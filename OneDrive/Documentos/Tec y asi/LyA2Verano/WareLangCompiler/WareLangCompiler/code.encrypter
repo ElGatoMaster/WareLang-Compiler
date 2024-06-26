@@ -4,21 +4,27 @@ CONF ENT x=0;
 CONF ENT y=0;
 CONF FREC alarm;
 VECT CAD buscados[5];
-CONF BOOL encontrado;
+CONF BOOL encontrado = 5;
 CONF MINI cont = 0;
 
 //DECLARACION METODOS
 DEF metodoSP(){
    SI(REVISAR(#000000,12)==VERDADERO){
       buscados[cont] = 'producto1';
-      encontrado = VERDADERO;
+      encontrado = 7.1;
       ALARMA(alarm);
       avanzarConCuidado();
       cont+=1;
    }SINO{
       avanzarConCuidado();
       encontrado = FALSO;
+      variable = 5;
+      x = 'arrancate richard';
    }
+}
+
+DEF metodoSP(){
+   cadena = 'prueba';
 }
 
 DEF avanzarConCuidado(){
