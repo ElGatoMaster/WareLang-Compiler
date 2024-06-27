@@ -50,7 +50,6 @@ public class Compilador extends javax.swing.JFrame {
 
     private boolean estadoCompilacion = false;
     private tablaSimbolosIdent tabla;
-    private tablaMetodosUs tabla2;
     private tablaListas tablaV;
     private tablaTokens tablaT;
 
@@ -79,7 +78,6 @@ public class Compilador extends javax.swing.JFrame {
         titulo = "WareLangCompiler";
         setLocationRelativeTo(null);
         tabla = new tablaSimbolosIdent(this, true);
-        tabla2 = new tablaMetodosUs(this, true);
         tablaV = new tablaListas(this, true);
         tablaT = new tablaTokens(this, true);
 
@@ -150,7 +148,6 @@ public class Compilador extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -214,7 +211,7 @@ public class Compilador extends javax.swing.JFrame {
         );
 
         areaCodigo.setBackground(new java.awt.Color(204, 204, 204));
-        areaCodigo.setFont(new java.awt.Font("Courier New", 0, 13)); // NOI18N
+        areaCodigo.setFont(new java.awt.Font("Courier New", 0, 14)); // NOI18N
         areaCodigo.setCaretColor(new java.awt.Color(255, 255, 255));
         jScrollPane1.setViewportView(areaCodigo);
 
@@ -275,14 +272,6 @@ public class Compilador extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem3);
-
-        jMenuItem2.setText("Métodos");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
 
@@ -361,10 +350,6 @@ public class Compilador extends javax.swing.JFrame {
         tabla.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        tabla2.setVisible(true);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         tablaT.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -391,8 +376,6 @@ public class Compilador extends javax.swing.JFrame {
         tablaT.llenarTabla();
         tabla.setSimbolos(simbolos);
         tabla.llenarTabla();
-        tabla2.setSimbolos(metodos);
-        tabla2.llenarTabla();
         tablaV.setSimbolos(idVector);
         tablaV.llenarTabla();
     }
@@ -467,7 +450,8 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.delete("ERROR_7", 9, "Error Léxico ({}): En la línea #, Cadena no reconocida");
 
         //production - ArrayList de Producciones donde deseamos guardar las agrupaciones realizadas
-        /// AGRUPACIONES
+        
+     //************************* AGRUPACIONES ******************
         gramatica.group("Numero", "(Numero_Entero | Numero_Decimal | Numero_Mini)");
         gramatica.group("Valor", "(Hexadecimal | Verdadero | Falso  | Cadena)");
         gramatica.group("TipoDato", "(FREC | ENT | COLOR | DEC | BOOL | CAD | MINI)");
@@ -476,54 +460,39 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("Op_Asign", "(Op_MasIgual | Op_MenosIgual)");
         gramatica.group("OpRel", "(OpRel_Igual | OpRel_NoIgual | OpRel_Menor | OpRel_Mayor | OpRel_MenorIg | OpRel_MayorIg)");
         gramatica.group("OpLog", "(OpLog_Y | OpLog_O | OpLgo_NO)");
-        //gramatica.group("OpImpr", "(CONSOL| LCD)");
+        gramatica.group("OpImpr", "(CONSOL| LCD)");
         gramatica.group("MetodoSP", "F_SOLTAR | APAGAR | PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR ");
+        
 
-        //******************** PARAMETROS  *******************
-        gramatica.group("Parametros", "Par_abr TipoDato Identificador (Coma TipoDato Identificador)* Par_cer ");
-
-        gramatica.group("Parametros", "Par_abr ((Coma) TipoDato)+ Par_cer ", true, 29,
-                "Error sintáctico (29): En la línea #, Declaración de parámetros inconclusa.");
-
-        gramatica.group("Parametros", "Par_abr (TipoDato (Coma))+ Par_cer ", true, 29,
-                "Error sintáctico (29): En la línea #, Declaración de parámetros inconclusa.");
-
-        gramatica.group("Parametros", "Par_abr ((Coma)+ TipoDato Identificador)+ Par_cer ", true, 29,
-                "Error sintáctico (29): En la línea #, Declaración de parámetros inconclusa.");
-
-        gramatica.group("Parametros", "Par_abr (TipoDato Identificador (Coma)+ )+ Par_cer ", true, 29,
-                "Error sintáctico (29): En la línea #, Declaración de parámetros inconclusa.");
-
-        gramatica.group("Parametros", "Par_abr (Coma)+ Par_cer ", true, 29,
-                "Error sintáctico (29): En la línea #, Declaración de parámetros inconclusa.");
-        gramatica.finalLineColumn();
-
-        //******* VECTORES **********************
-        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr Numero Corch_cer ", vectores);
-
+        //***************************************** VECTORES *******************************
+        
+        
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr Numero Corch_cer ",vectores);
+       
         gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Op_asignacion Corch_abr"
-                + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ", vectores);
-
-        //Errores
-        gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion  Corch_abr (Corch_abr)+"
+                + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ",vectores);
+        
+          //Errores
+          gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion  Corch_abr (Corch_abr)+"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)* (Corch_cer)+", 51,
                 "Error sintáctico (51): En la línea #, Existen corchetes de más.");
-
-        gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion (Corch_abr)+ "
+        
+         gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion (Corch_abr)+ "
                 + " ((Valor | Numero) | (Valor | Numero) Coma)* Corch_cer Corch_cer (Corch_cer)+", 51,
-                "Error sintáctico (51): En la línea #, Existen corchetes de más.");
-
-        gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador (Op_Adisi|Op_Multi|OpRel|OpLog) (Corch_abr)+"
+                "Error sintáctico (51): En la línea #, Existen corchetes de más.");  
+         
+         gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador (Op_Adisi|Op_Multi|OpRel|OpLog) (Corch_abr)+"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)* (Corch_cer)+", 52,
                 "Error sintáctico (52): En la línea #, Operador invalido para la asignación.");
-
+        
+        
         gramatica.group("DeclaracionVect", "VECTOR TipoDato (Corch_abr)+ Corch_cer ", 12,
                 "Error sintáctico (15): En la línea #, Falta un identificador en la declaración.");
-
+        
         gramatica.group("DeclaracionVect", " VECTOR TipoDato  Op_asignacion (Corch_abr)+"
-                + " ((Valor | Numero) | (Valor | Numero) Coma)+ (Corch_cer)+ ", 15,
+                + " ((Valor | Numero) | (Valor | Numero) Coma)+ (Corch_cer)+ ",15,
                 "Error sintáctico (16): En la línea #, Falta palabra clave para poder declarar.");
-
+        
         gramatica.group("DeclaracionVect", "TipoDato (Corch_abr)+ (Corch_cer)+ ", 15,
                 "Error sintáctico (16): En la línea #, Falta palabra clave para poder declarar.");
 
@@ -540,15 +509,11 @@ public class Compilador extends javax.swing.JFrame {
                 "Error sintáctico (26): En la línea #, Faltan por asignar valores en la lista");
         gramatica.finalLineColumn();
 
-        /**
-         * *************** DECALARACION MATRIZ ******************** tratemos de
-         * no usar matrices gramatica.group("DeclaracionMatriz", "MATRIZ
-         * TipoDato Identificador Corch_abr Corch_cer Corch_abr Corch_cer",
-         * true);
-         */
-        //******************* DECLARACION DE VARIABLES ASIGNADA *********************
-        gramatica.group("DeclaracionAsignada", "CONF TipoDato Identificador Op_asignacion (Valor|Numero)", identValor);
+        
 
+        //*********************************** DECLARACION DE VARIABLES ASIGNADA **********************************
+        gramatica.group("DeclaracionAsignada", "CONF TipoDato Identificador Op_asignacion (Valor|Numero)", identValor);
+        
         gramatica.group("DeclaracionAsignada", "TipoDato Identificador (Op_Adisi|Op_Multi|OpRel|OpLog) (Valor|Numero)", 52,
                 "Error sintáctico (52): En la línea #, Operador invalido para la asignación.");
 
@@ -560,7 +525,7 @@ public class Compilador extends javax.swing.JFrame {
 
         gramatica.group("DeclaracionAsignada", "CONF Op_asignacion (Valor|Numero)", 12,
                 "Error sintáctico (15): En la línea #, Falta un identificador en la declaración.");
-
+        
         gramatica.group("DeclaracionAsignada", "CONF TipoDato Op_asignacion (Valor|Numero)", 12,
                 "Error sintáctico (15): En la línea #, Falta un identificador en la declaración.");
 
@@ -571,8 +536,10 @@ public class Compilador extends javax.swing.JFrame {
                 "Error sintáctico (25): En la línea #, Falta símbolo de asignación");
         gramatica.finalLineColumn();
 
-        // ******** DECLARACION SIMPLE ********
-        gramatica.group("DeclaracionVariable", "CONF TipoDato Identificador", idSValor);
+       
+        
+        // ******************************* DECLARACION SIMPLE *******************************
+        gramatica.group("DeclaracionVariable", "CONF TipoDato Identificador", idSValor );
 
         // Errores
         gramatica.group("DeclaracionVariable", "TipoDato Identificador", 15,
@@ -588,8 +555,9 @@ public class Compilador extends javax.swing.JFrame {
                 "Error sintáctico (14): En la línea #, No está definido el tipo de dato en la declaración.");
 
         gramatica.finalLineColumn();
-
-        //********************* DECLARACIONES ********************
+   
+        
+        //************************************** DECLARACIONES ************************************
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.group("Declaracion", "(DeclaracionVariable Punto_coma  | DeclaracionAsignada  Punto_coma | DeclaracionVect Punto_coma | DeclaracionMatriz Punto_coma )");
             gramatica.group("Declaracion", "(DeclaracionVariable | DeclaracionAsignada | DeclaracionVect | DeclaracionMatriz)", 11,
@@ -597,435 +565,486 @@ public class Compilador extends javax.swing.JFrame {
             gramatica.group("Declaraciones", "(Declaracion | Declaracion Declaraciones)*");
             gramatica.finalLineColumn();
         });
-
-        //*********************** parametros **************************
-//        gramatica.group("ParmetrosLlamada", "((Identificador|Valor|Numero) (Coma (Identificador|Valor|Numero))*)");        
-        //ERRORES
-        gramatica.group("ParmetrosLlamada", "Par_abr  (Coma)+ Par_cer", 29,
-                "Error sintáctico (29): En la línea #, Faltan parámetros por declarar.");
-        gramatica.group("ParmetrosLlamada", "Par_abr  ((Coma (Identificador|Valor|Numero))+ Par_cer", true, 29,
-                "Error sintáctico (29): En la línea #, Declaración de parámetros inconclusa.");
-
-        //////// !!!!!!!!!!!!!!!! FALTANNNNNNNNNNNNNNNNN
-        gramatica.group("MetodoEstatique", "MetodoSP Par_abr Par_cer Punto_coma");
-
-        gramatica.group("MetodoEstatique", "MetodoSP Punto_coma", 57,
-                "Error sintáctico (49): En la línea #, Faltan parentésis depúes de la palabra reservada.");
-
-        gramatica.group("MetodoEstatique", "MetodoSP", 57,
-                "Error sintáctico (49): En la línea #, Faltan parentésis depúes de la palabra reservada.");
-
-        gramatica.group("MetodoEstatique", "MetodoSP Par_abr (Valor | Numero| Identificador| ERROR_7)Par_cer Punto_coma", 50,
+              
+        
+        
+        //*************************** MÉTODOS ESTÁTICOS (MetodoSP) ***************************************
+    
+        gramatica.group("MetodoEstatique", "MetodoSP Par_abr Par_cer"); 
+        
+        
+        gramatica.group("MetodoEstatique", "MetodoSP",57,
+                "Error sintáctico (49): En la línea #, Faltan parentésis despúes de la palabra reservada.");
+          
+        gramatica.group("MetodoEstatique", "MetodoSP Par_abr (Valor | Numero| Identificador| ERROR_7)Par_cer ",50,
                 "Error sintáctico (50): En la línea #, Sintaxis de método incorrecta.");
-
-        gramatica.group("MetodoEstatique", "MetodoSP (Par_abr)+ Par_cer (Par_cer)+ Punto_coma", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("MetodoEstatique", "MetodoSP (Par_abr)+ Par_abr (Par_cer)+ Punto_coma", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("MetodoEstatique", "MetodoSP Par_abr Punto_coma", 19,
+                     
+        gramatica.group("MetodoEstatique", "MetodoSP Par_abr ",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-
-        gramatica.group("MetodoEstatique", "MetodoSP  Par_cer Punto_coma", 19,
+        
+        gramatica.group("MetodoEstatique", "MetodoSP  Par_cer ",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-
-        //DECLARACION DE METODOS de usuario
-        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Parametros", mets);
-        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Par_abr Par_cer", mets);
-
-        //LLAMADA A METODOS SIN PARAMETROS
-        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer Punto_coma");
-
-        gramatica.group("MetodoEstatique", "Identificador (Par_abr)+ Par_cer (Par_cer)+ Punto_coma", 49,
+        
+        gramatica.group("MetodoEstatique", "MetodoSP (Par_abr)+ Par_cer (Par_cer)+ ",49,
                 "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("MetodoEstatique", "Identificador ((Par_abr)+ Par_abr (Par_cer)+ Punto_coma", 49,
+        
+        gramatica.group("MetodoEstatique", "MetodoSP (Par_abr)+ Par_abr (Par_cer)+ ",49,
                 "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("MetodoEstatique", "Identificador Par_abr Par_cer", 11,
-                "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
-
-        //LLAMADA A METODOS CON PARAMETROS
-        gramatica.group("MetodoEstatique", "Identificador Par_abr ((Identificador|Valor|Numero) (Coma (Identificador|Valor|Numero))*) Par_cer Punto_coma");
-
-        gramatica.group("MetodoEstatique", "Identificador Par_abr ((Identificador|Valor|Numero) (Coma (Identificador|Valor|Numero))*) Par_cer ", 11,
-                "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
-
-        gramatica.group("MetodoEstatique", "Identificador Par_abr ((Identificador|Valor|Numero) ((Coma)+ (Identificador|Valor|Numero))*) Par_cer ", 54,
-                "Error sintáctico (54): En la línea #, Faltan valores en los parámetros");
-
-        gramatica.group("MetodoEstatique", "Identificador Par_abr (Coma)+  Par_cer ", 54,
-                "Error sintáctico (54): En la línea #, Faltan valores en los parámetros");
-
-        gramatica.group("MetodoEstatique", "MetodoSP Par_abr Par_cer ", 11,
-                "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
-
-        gramatica.group("DeclaracionMetodo", "Identificador Parametros ", 44,
+               
+  
+        
+        // **********************  DECLARACION DE METODOS **********************************
+        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Par_abr Par_cer",mets);
+        
+        gramatica.group("DeclaracionMetodoError", "(Identificador|Expresion) Par_abr Par_cer Llav_abr");
+        
+        //*************  LLAMADA A METODOS SIN PARAMETROS ******************* 
+        gramatica.group("MetodoEstatique", "(Identificador|Expresion) Par_abr Par_cer");
+        
+//        gramatica.group("MetodoEstatique", "(Identificador|Expresion) Par_cer",52,
+//                "Error sintáctico (52): En la línea #, Falta abrir o cerrar paréntesis.");
+        
+        gramatica.group("MetodoEstatique", "(Identificador|Expresion) Par_abr ",52,
+                "Error sintáctico (52): En la línea #, Falta abrir o cerrar paréntesis.");
+                 
+        gramatica.group("MetodoEstatique", "(Identificador|Expresion) (Par_abr)+ Par_cer (Par_cer)+ Punto_coma",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("MetodoEstatique", "(Identificador|Expresion) (Par_abr)+ Par_abr (Par_cer)+ Punto_coma",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+                      
+        gramatica.group("DeclaracionMetodo", "(Identificador|Expresion) Parametros ",44,
                 "Error sintáctico (44): En la línea #, Falta palabra clave para definir método.");
-
-        gramatica.group("DeclaracionMetodo", "Identificador Par_abr Par_cer", 44,
-                "Error sintáctico (44): En la línea #, Falta palabra clave para definir método.");
-
-        gramatica.group("DeclaracionMetodo", "DEF  Parametros", 45,
+      
+        gramatica.group("DeclaracionMetodo", "DEF Par_abr Par_cer",45,
                 "Error sintáctico (45): En la línea #, Falta nombre del método.");
+        
 
-        gramatica.group("DeclaracionMetodo", "DEF  Par_abr Par_cer", 45,
-                "Error sintáctico (45): En la línea #, Falta nombre del método.");
-
-        gramatica.group("ERRORES", "Par_abr Par_cer Punto_coma", 49,
-                "Error sintáctico (49): En la línea #, Falta palabra reservada.");
-
-        gramatica.group("ERRORES", "(ERROR_1 | ERROR_7) Par_abr Par_cer Punto_coma", 49,
-                "Error sintáctico (49): En la línea #, Falta palabra reservada");
-
-        //******************* EST CAJA **********************
-        gramatica.group("EstCaja", "F_CAJA Par_abr (Identificador | Numero) Par_cer");
-        // ERRORES CAJa
-
-        gramatica.group("EstCaja", "F_CAJA ", 11,
-                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("EstCaja", "F_CAJA Par_abr  Par_cer", 16,
-                "Error sintáctico (16): En la línea #, Estructura inválida del método falta un valor.");
-
-        gramatica.group("EstCaja", "F_CAJA  (Par_abr)+ (Identificador | Numero) Par_cer (Par_cer)+ ", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("EstCaja", "F_CAJA  (Par_abr)+ Par_abr (Identificador | Numero) (Par_cer)+ ", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("EstCaja", "F_CAJA (Identificador | Numero) Par_cer", 11,
-                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("EstCaja", "F_CAJA Par_abr (Identificador | Numero) ", 11,
-                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.finalLineColumn();
-
-        //******************* EST ALARMA**********************
-        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador | Numero) Par_cer");
+                
+        //********************************** EST ALARMA ***************************
+        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador) Par_cer");
+        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Numero) Par_cer");
+       
         // ERRORES ALARMA
-        gramatica.group("EstAlarma", "F_ALARMA", 19,
-                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-
         gramatica.group("EstAlarma", "F_ALARMA Par_abr Par_cer", 20,
                 "Error sintáctico (23): En la línea #, Falta un valor en método.");
-
-        gramatica.group("EstAlarma", "F_ALARMA  (Par_abr)+ (Identificador | Numero) Par_cer (Par_cer)+ ", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("EstAlarma", "F_ALARMA (Par_abr)+ Par_abr (Identificador | Numero) (Par_cer)+ ", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
+        
+        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador | Numero)", 18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador | Numero)  ", 18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        gramatica.group("EstAlarma", "F_ALARMA  (Par_abr)+ (Identificador | Numero) Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstAlarma", "F_ALARMA (Par_abr)+ Par_abr (Identificador | Numero) (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
 
         gramatica.group("EstAlarma", "F_ALARMA (Identificador | Numero) Par_cer", 18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador | Numero)", 18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador | Numero)  ", 18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-
+        
+        gramatica.group("EstAlarma", "F_ALARMA", 19,
+                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
+     
+        
         gramatica.finalLineColumn();
+        
+        
+        //********************************* EST CAJA *******************************
 
-        //******************************METODOS REVISAR***********************
+        gramatica.group("EstCaja", "F_CAJA Par_abr (Identificador | Numero) Par_cer");
+        // ERRORES CAJa 
+        gramatica.group("EstCaja", "F_CAJA ", 11,
+                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis ().");
+                
+        gramatica.group("EstCaja", "F_CAJA Par_abr  Par_cer", 16,
+                "Error sintáctico (16): En la línea #, Estructura inválida del método falta un valor.");
+        
+        gramatica.group("EstCaja", "F_CAJA (Identificador | Numero) Par_cer", 11,
+                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        gramatica.group("EstCaja", "F_CAJA Par_abr (Identificador | Numero) ", 11,
+                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        gramatica.group("EstCaja", "F_CAJA  (Par_abr)+ (Identificador | Numero) Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstCaja", "F_CAJA  (Par_abr)+ Par_abr (Identificador | Numero) (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+            gramatica.finalLineColumn();
+                
+
+       
+
+        //********************************** EST REVISAR **************************
         gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador) Coma (Identificador | Numero) Par_cer");
-
-        //ERRORESSS
-        gramatica.group("EstRevisar", "F_REVISAR ", 19,
+        
+                 
+        gramatica.group("EstRevisar", "F_REVISAR Par_abr  Par_cer",20,
+                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
+        
+        gramatica.group("EstRevisar", "F_REVISAR ",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-
-        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador) (Coma)+ (Identificador | Numero) Par_cer", 55,
-                "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas (,) de más");
-
-        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador) Coma (Identificador | Numero)", 18,
+        
+        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador) (Coma)+ (Identificador | Numero) Par_cer",55,
+                    "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas (,) de más");
+        
+        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador) Coma (Identificador | Numero)",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("EstRevisar", "F_REVISAR  (Valor|Identificador) Coma (Identificador | Numero) Par_cer", 18,
+        
+        gramatica.group("EstRevisar", "F_REVISAR  (Valor|Identificador) Coma (Identificador | Numero) Par_cer",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("EstRevisar", "F_REVISAR Par_abr  Coma (Identificador | Numero) Par_cer", 20,
+        
+        gramatica.group("EstRevisar", "F_REVISAR Par_abr  Coma (Identificador | Numero) Par_cer",20,
                 "Error sintáctico (25): En la línea #, Falta valor en el parámetro de color.");
-
-        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador)  Coma  Par_cer", 21,
+        
+        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador)  Coma  Par_cer",21,
                 "Error sintáctico (26): En la línea #, Falta valor en el parámetro de puerto.");
-
-        gramatica.group("EstRevisar", "F_REVISAR Par_abr   (Coma)+  Par_cer", 20,
+        
+         gramatica.group("EstRevisar", "F_REVISAR Par_abr   (Coma)+  Par_cer",20,
                 "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
-
-        gramatica.group("EstRevisar", "F_REVISAR Par_abr   Par_cer", 20,
-                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
-
-        gramatica.group("EstRevisar", "F_REVISAR   (Par_abr)+ (Valor|Identificador)? Coma (Identificador | Numero)? Par_cer (Par_cer)+ ", 49,
+         
+         gramatica.group("EstRevisar", "F_REVISAR   (Par_abr)+ (Valor|Identificador)? Coma (Identificador | Numero)? Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstRevisar", "F_REVISAR (Par_abr)+ Par_abr (Valor|Identificador)? Coma (Identificador | Numero)? (Par_cer)+ ",49,
                 "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("EstRevisar", "F_REVISAR (Par_abr)+ Par_abr (Valor|Identificador)? Coma (Identificador | Numero)? (Par_cer)+ ", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("EstRevisar", "Par_abr (Valor|Identificador) Coma (Identificador | Numero) Par_cer", 19,
+         
+         gramatica.group("EstRevisar", "Par_abr (Valor|Identificador) Coma (Identificador | Numero) Par_cer", 19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
         gramatica.finalLineColumn();
-
-        //******************************   MOVIMIENTO    ***********************
+        
+ 
+        
+        //************************************  F_MOVIMIENTO    ****************************
         gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
                 + "Par_abr (Numero| Identificador) Coma (Numero | Identificador) Par_cer ");
+        
+                
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr  Coma (Numero | Identificador) Par_cer  ",20,
+                "Error sintáctico (23): En la línea #, Falta un valor en método."); 
+        
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr (Numero| Identificador) (Coma)+ (Numero | Identificador) Par_cer ",55,
+                    "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas (,) de más");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr (Numero| Identificador) Coma Par_cer  ",20,
+                "Error sintáctico (23): En la línea #, Falta un valor en método.");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) (Par_abr)+ (Numero| Identificador)"
+                + " Coma (Numero | Identificador) Par_cer Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) Par_abr Par_abr (Par_abr)+ "
+                + " (Numero| Identificador) Coma (Numero | Identificador) (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
+  
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr  Coma  Par_cer  ",20,
+                "Error sintáctico (23): En la línea #, Falta un valor en método.");
+         
+         gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr  Par_cer ",43,
+                "Error sintáctico (43): En la línea #, Faltan valores en el método");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr (Numero| Identificador) Coma (Numero | Identificador) ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + " (Numero| Identificador) Coma (Numero | Identificador) Par_cer  ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
 
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) ", 19,
+       gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) ",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
 
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr (Numero| Identificador) (Coma)+ (Numero | Identificador) Par_cer ", 55,
-                "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas (,) de más");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) (Par_abr)+ (Numero| Identificador)"
-                + " Coma (Numero | Identificador) Par_cer Par_cer (Par_cer)+ ", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) Par_abr Par_abr (Par_abr)+ "
-                + " (Numero| Identificador) Coma (Numero | Identificador) (Par_cer)+ ", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr  Coma  Par_cer  ", 20,
-                "Error sintáctico (23): En la línea #, Falta un valor en método.");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr  Par_cer ", 43,
-                "Error sintáctico (43): En la línea #, Faltan valores en el método");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr (Numero| Identificador) Coma (Numero | Identificador) ", 18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + " (Numero| Identificador) Coma (Numero | Identificador) Par_cer  ", 18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr (Numero| Identificador) Coma Par_cer  ", 20,
-                "Error sintáctico (23): En la línea #, Falta un valor en método.");
-
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr  Coma (Numero | Identificador) Par_cer  ", 20,
-                "Error sintáctico (23): En la línea #, Falta un valor en método.");
-
+       
         gramatica.finalLineColumn();
+        
+        
+       
+    //**********************************METODOS IMPRM  ***********************
+        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor|metListaSacar) Coma OpImpr Par_cer");
+        
+        gramatica.group("EstImpr", "F_IMPR ",19,
+                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
+        
+        gramatica.group("EstRevisar", "F_IMPR Par_abr (Valor|metListaSacar) (Coma)+ OpImpr Par_cer",55,
+                    "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas de más");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Numero Coma OpImpr Par_cer",32,
+                "Error sintáctico (32): En la línea #, No se permite un numero como mensaje a imprimir.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Par_cer",20,
+                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
+        gramatica.group("EstImpr", "F_IMPR  (Par_abr)+ (Valor|metListaSacar) Coma OpImpr Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstImpr", "F_IMPR (Par_abr)+ Par_abr (Valor|metListaSacar) Coma OpImpr (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Coma Par_cer",20,
+                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma Par_cer",30,
+                "Error sintáctico (30): En la línea #, Falta donde se imprimirá el mensaje.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Coma OpImpr Par_cer",31,
+                "Error sintáctico (31): En la línea #, Falta mensaje a imprimir.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma OpImpr ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+         gramatica.group("EstImpr", "F_IMPR Valor Coma OpImpr Par_cer ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        
+         gramatica.finalLineColumn(); 
 
-        //*********************** MÉTODOS ESTATICOS**************************
-//        gramatica.group("MetodoEstatique", "(F_SOLTAR | F_APAGAR | F_PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR )"
-//                + " Par_abr ",18,
-//                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ()."); 
-//        
-//        gramatica.group("MetodoEstatique", "(F_SOLTAR | F_APAGAR | F_PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR )"
-//                + "  Par_cer",18,
-//                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ()."); 
-//        
-//        gramatica.group("MetodoEstatique", "(F_SOLTAR | F_APAGAR | F_PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR)",19,
-//                "Error sintáctico (19): En la línea #, Estructura inválida del método.");       
-//        gramatica.finalLineColumn();
-        //////// !!!!!!!!!!!!!!!! FALTANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-        // ******************************** metodos ****************************  
-        //****************** ESTRUCTUTA REPETIR*********
+     
+        
+        
+        //******************************  ESTRUCTUTA REPETIR   *********************************
         gramatica.group("EstRepetir", "Est_REPETIR Par_abr (Numero | Identificador | metListaRet) Par_cer ");
         // ERRORES REPETIR
-        gramatica.group("EstRepetir", "Est_REPETIR Par_abr  Par_cer ", 19,
-                "Error sintáctico (23): En la línea #, Falta un valor.");
-
-        gramatica.group("EstRepetir", "Est_REPETIR F_CANTIDAD Par_abr (Par_abr)+ (Numero | Identificador | metListaRet) Par_cer (Par_cer)+", 49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("EstRepetir", "Est_REPETIR ", 18,
+        gramatica.group("EstRepetir", "Est_REPETIR Par_abr  Par_cer ",19,
+                "Error sintáctico (23): En la línea #, Falta un valor."); 
+        
+        gramatica.group("EstRepetir", "Est_REPETIR F_CANTIDAD Par_abr (Par_abr)+ (Numero | Identificador | metListaRet) Par_cer (Par_cer)+",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstRepetir", "Est_REPETIR ",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar parentesis ().");
-
-        gramatica.group("EstRepetir", "Est_REPETIR (Numero | Identificador) Par_cer ", 18,
+        
+        gramatica.group("EstRepetir", "Est_REPETIR (Numero | Identificador) Par_cer ",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar parentesis ().");
-
-        gramatica.group("EstRepetir", "Est_REPETIR Par_abr (Numero | Identificador) ", 18,
+        
+        gramatica.group("EstRepetir", "Est_REPETIR Par_abr (Numero | Identificador) ",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar parentesis ().");
-
-        gramatica.group("EstRepetir", "Par_abr (Numero | Identificador) Par_cer ", 15,
+        
+        gramatica.group("EstRepetir", "Par_abr (Numero | Identificador) Par_cer ",15,
                 "Error sintáctico (16): En la línea #, Falta palabra clave.");
         gramatica.finalLineColumn();
-
-        gramatica.group("EstVER", "(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_abr Par_cer");
-
-        gramatica.group("LlamadaCond", "(EstRevisar | F_MOV | "
-                + " EstAlarma | EstCaja | EstVER)");
-
-        //   ASIGNACIOON SI IGUAL
-        gramatica.group("Asignacion", "(Identificador) Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma",asign);
-        gramatica.group("Asignacion", "(Expresion|Identificador) Op_Asign (Expresion|Identificador|Numero) Punto_coma",asign);
-        gramatica.group("Asignacion", "(Identificador)Corch_abr (Identificador|Numero)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma");
-
-//        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-//            gramatica.group("Factor", "Numero | Identificador");
-//            gramatica.group("FactorOp", "(Factor Op_Adisi | Factor Op_Multi)+");
-//            gramatica.group("FactorOp", "(Factor)+");
-//            gramatica.group("ExpArit", "(FactorOp | FactorOp ExpArit )+");
-//        });
-//
-//            gramatica.group("ExpAritF", "(ExpArit)+");
-        //////// !!!!!!!!!!!!!!!! FALTANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-        //****************** EXPRESIONES REL Y LOGICAS *********
+        
+        
+        
+        //*************************** VER **************************************************
+        gramatica.group("EstVER","(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_abr Par_cer");
+        gramatica.group("LlamadaCond", "(EstRevisar | EstVER)");
+  
+        
+         
+       //***************************************** ASIGNACIONES *************************
+       gramatica.group("Asignacion", "(Identificador) Op_asignacion (Expresion|Identificador|Numero|Valor)", asign);
+       
+       gramatica.group("Asignacion", "(Identificador)    Op_Adisi (Expresion|Identificador|Numero|Valor)",56,
+                    "Error sintáctico (56): En la línea #, Operador invalido para esta operación");
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) Op_Asign (Expresion|Identificador|Numero) ", asign);
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) Op_Adisi (Expresion|Identificador|Numero) ",56,
+                    "Error sintáctico (56): En la línea #, Operador invalido para esta operación");
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr (Identificador|Numero)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor)");
+       
+        gramatica.group("Asignacion", "(Identificador) Corch_abr (Identificador|Numero)Corch_cer Op_Adisi"
+                + "(Expresion|Identificador|Numero|Valor)",56,
+                    "Error sintáctico (56): En la línea #, Operador invalido para esta operación");
+        
+        
+    
+       
+        //***************************** EXPRESIONES REL Y LOGICAS *********************************
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("ExpresionDos", "LlamadaCond");
+            gramatica.group("ExpresionDos","LlamadaCond");
             gramatica.group("Expresion", "Par_abr ExpAritF Par_cer |ExpAritF | Valor | Numero | Identificador");
             gramatica.group("ExpRel", "(Expresion |ExpresionDos) OpRel (Expresion |ExpresionDos)");
-            gramatica.group("ExpRel", "(Expresion |ExpresionDos) (Op_Adisi |Op_Adisi|Op_Asign|Op_asignacion)"
-                    + "(Expresion |ExpresionDos)", 56,
+            gramatica.group("ExpRel", "(Expresion |ExpresionDos) (Op_Adisi|Op_Asign|Op_asignacion)"
+                    + "(Expresion |ExpresionDos)",56,
                     "Error sintáctico (56): En la línea #, Operador invalido para esta operación");
             gramatica.group("ExpLog", "ExpRel | ExpLog OpLog ExpLog |  ExpLog ");
-        });
+         });
 
-        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("LlamadaEstatica", "ExpresionDos Punto_coma");
 
-            gramatica.group("LlamadaEstatica", "ExpresionDos ", 11,
-                    "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
+       
+       // ******************************* Errores de asignacion ******************************
+       
+       gramatica.group("Asignacion", "(ERROR_1 |ERROR_7)* Op_Asign (Expresion|Identificador|Numero) ",53,
+                "Error sintáctico (53): En la línea #, Sentencia incompleta");
+       
+       gramatica.group("Asignacion", "(ERROR_1 |ERROR_7)* Op_asignacion (Expresion|Identificador|Numero|Valor)",53,
+                "Error sintáctico (53): En la línea #, Sentencia incompleta");
+       
+       gramatica.group("Asignacion", "(ERROR_1 |ERROR_7)* Corch_abr (Identificador|Numero)Corch_cer Op_asignacion"
+               + " (Expresion|Identificador|Numero|Valor)",53, "Error sintáctico (53): En la línea #, Sentencia incompleta");
+       
+        gramatica.group("Asignacion", "(Expresion|Identificador) Op_asignacion",41,
+                    "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
+        
+       gramatica.group("Asignacion", "(Expresion|Identificador) Op_Asign",41,
+                    "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
+       
+       gramatica.group("Asignacion", "(Identificador)Corch_abr (Identificador|Numero)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) ",11,
+               "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
+       
+       gramatica.group("Asignacion", "(Identificador) Corch_abr (Identificador|Numero)Corch_cer Op_asignacion ",41,
+               "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) (Corch_abr) Asignacion",51,
+               "Error sintáctico (51): En la línea #, Falta abrir o cerrar corchetes");
+       gramatica.group("Asignacion", "(Expresion|Identificador)  (Expresion|Identificador|Numero)(Corch_cer) Op_asignacion (Expresion|Identificador|Numero|Valor)",51,
+               "Error sintáctico (51): En la línea #, Falta abrir o cerrar corchetes");
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) ",52,
+               "Error sintáctico (52): En la línea #, Falta el indice del arreglo");
+       
+       
+       gramatica.finalLineColumn();
+            
 
-            gramatica.group("MetodosEstaticos", "(LlamadaEstatica | LlamadaEstatica  MetodosEstaticos)+");
-        });
-
-        //Errores
-        gramatica.group("Asignacion", "(Expresion|Identificador) Op_asignacion (Expresion|Identificador|Numero|Valor)", 11,
-                "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
-
-        gramatica.group("Asignacion", "(Expresion|Identificador) Op_Asign (Expresion|Identificador|Numero)", 11,
-                "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
-
-        gramatica.group("Asignacion", "(Expresion|Identificador) Op_asignacion Punto_coma", 41,
-                "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
-
-        gramatica.group("Asignacion", "(Expresion|Identificador) Op_Asign Punto_coma ", 41,
-                "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
-
-        gramatica.group("Asignacion", "(Identificador)Corch_abr (Identificador|Numero)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) ", 11,
-                "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
-
-        gramatica.group("Asignacion", "(Identificador) Corch_abr (Identificador|Numero)Corch_cer Op_asignacion Punto_coma", 41,
-                "Error sintáctico (41): En la línea #, Asignación incompleta falta un valor");
-
-        gramatica.group("Asignacion", "(Expresion|Identificador) (Corch_abr) Asignacion", 51,
-                "Error sintáctico (51): En la línea #, Falta abrir o cerrar corchetes");
-        gramatica.group("Asignacion", "(Expresion|Identificador)  (Expresion|Identificador|Numero)(Corch_cer) Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma", 51,
-                "Error sintáctico (51): En la línea #, Falta abrir o cerrar corchetes");
-
-        gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) Punto_coma", 52,
-                "Error sintáctico (52): En la línea #, Falta el indice del arreglo");
-
-        gramatica.finalLineColumn();
-
-        //////// !!!!!!!!!!!!!!!! FALTANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-        //****************** ESTRUCTURA SIII *********
+        //*************************** ESTRUCTURA SII Y SINO *********************************
         gramatica.group("EstSi", "Est_SI Par_abr ExpLog Par_cer");
-
-        gramatica.group("EstSi", "Est_SI  (Par_abr)+  ExpLog  Par_cer (Par_cer)+(Par_cer Par_cer Par_cer Par_cer)?", 48,
+        
+        
+        gramatica.group("EstSi", "Est_SI  (Par_abr)+  ExpLog  Par_cer (Par_cer)+(Par_cer Par_cer Par_cer Par_cer)?",48,
                 "Error sintáctico (48): En la línea #, Existen paréntesis de más.");
-
-        gramatica.group("EstSi", "Est_SI  Par_abr (Par_abr)+ ExpLog (Par_cer)+", 48,
-                "Error sintáctico (48): En la línea #,Existen paréntesis de más.");
-
-        gramatica.group("EstSi", "Est_SI Par_abr ExpLog ", 18,
+        
+        gramatica.group("EstSi", "Est_SI  Par_abr (Par_abr)+ ExpLog (Par_cer)+",48,
+                "Error sintáctico (48): En la línea #,Existen paréntesis de más.");   
+        
+        
+        gramatica.group("EstSi", "Est_SI Par_abr ExpLog ",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar parentesis ().");
-
-        gramatica.group("EstSi", "Est_SI ExpLog Par_cer ", 18,
+        
+        gramatica.group("EstSi", "Est_SI ExpLog Par_cer ",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar parentesis ().");
-
-        gramatica.group("EstSi", "Est_SI Par_abr  ar_cer", 39,
+                              
+        gramatica.group("EstSi", "Est_SI Par_abr  Par_cer",39,
                 "Advertencia (39): En la línea #, No existe condición a evaluar.");
-
+        
         gramatica.finalLineColumn();
-
+    
         gramatica.group("EstSiNO", "Est_SINO");
+        
 
-        //****************** ESTRUCTUTA MIENTRAS *********
+
+        //***************************** ESTRUCTUTA MIENTRAS *****************************
         gramatica.group("EstMientras", "Est_MIENTRAS Par_abr ExpLog Par_cer");
-
-        gramatica.group("EstSi", "Est_MIENTRAS (Par_abr)+ Par_abr ExpLog Par_cer (Par_cer)+", 48,
+        
+        gramatica.group("EstMientras", "Est_MIENTRAS (Par_abr)+ Par_abr ExpLog Par_cer (Par_cer)+",48,
                 "Error sintáctico (18): En la línea #, Existen parentesis de más().");
-
-        gramatica.group("EstMientras", "Est_MIENTRAS Par_abr ExpLog ", 18,
+        
+        gramatica.group("EstMientras", "Est_MIENTRAS Par_abr ExpLog ",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar parentesis ().");
-
-        gramatica.group("EstMientras", "Est_MIENTRAS ExpLog Par_cer ", 18,
+        
+        gramatica.group("EstMientras", "Est_MIENTRAS ExpLog Par_cer ",18,
                 "Error sintáctico (18): En la línea #, Falta abrir o cerrar parentesis ().");
-
-        gramatica.group("EstMientras", "Est_MIENTRAS Par_abr  Par_cer", 39,
+                              
+        gramatica.group("EstMientras", "Est_MIENTRAS Par_abr  Par_cer",39,
                 "Advertencia (39): En la línea #, No existe condición a evaluar.");
-
+        
         //ERROR PARA ESTRUCTURAS CONDICIONALES
-        gramatica.group("EstSi", "(ERROR_1 |ERROR_7)* Par_abr ExpLog Par_cer", 50,
+        gramatica.group("EstSi", "(ERROR_1 |ERROR_7)* Par_abr ExpLog Par_cer",50,
                 "Error sintáctico (50): En la línea #, Falta palabra reservada");
 
-//       gramatica.group("MetodoagregarPuntocoma", "metListaAgre Punto_coma");
-//       gramatica.group("MetodoagregarPuntocoma", "metListaAgre ",11,
-//                    "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
-        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+        
+        
+        //ERRORES SINGULARES 
+        
+        gramatica.group("ERRORES", "Par_abr Par_cer Punto_coma",49,
+                "Error sintáctico (49): En la línea #, Falta palabra reservada."); 
+            
+         gramatica.group("ERRORES", "(ERROR_1 | ERROR_7) Par_abr Par_cer Punto_coma",49,
+                "Error sintáctico (49): En la línea #, Falta palabra reservada"); 
 
-            gramatica.group("Sentencia", " (Asignacion | EstControl "
-                    + "| ExpresionDos| MetodosEstaticos | MetodoEstatique|ERRORES| ERRORES1)+");
+
+        // *********************** AGRUPACION DE SENTENCIAS **********************
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {          
+            gramatica.group("Sentencia", " ( EstControl | SentenciasPunto | ERRORES)+");
+            gramatica.group("SentenciasPunto", "(MetodoEstatique | Asignacion | ExpresionDos  | EstCaja | EstAlarma | F_MOV"
+                    + "| EstImpr) Punto_coma");
+            gramatica.group("SentenciasPunto", "(MetodoEstatique | Asignacion | ExpresionDos | EstCaja | EstAlarma | F_MOV"
+                    + "| EstImpr)",11,
+                    "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
             gramatica.group("DeclaracionesF", "(Declaraciones)+");
             gramatica.group("Sentencias", "(Sentencia | Sentencia Sentencias)+");
             gramatica.group("EstControl", "(EstMientras |  EstRepetir | EstSi | EstSiNO) Llav_abr (Sentencias|DeclaracionesF)* Llav_cer");
-
         });
-
-        //errores llaves control
-        gramatica.finalLineColumn();
-        gramatica.group("EstControl", "(EstMientras |  EstRepetir | EstSi | EstSiNO) Llav_abr (Sentencias|DeclaracionesF)*",
+        
+          
+            //errores llaves control
+            gramatica.finalLineColumn(); 
+            gramatica.group("EstControl", "(EstMientras |  EstRepetir | EstSi | EstSiNO) Llav_abr (Sentencias|DeclaracionesF)*",
                 34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
-        gramatica.initialLineColumn();
-        gramatica.group("EstControl", "(EstMientras |  EstRepetir | EstSi | EstSiNO) (Sentencias|DeclaracionesF)* Llav_cer",
-                34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
-
-        //si es coomo dices mirA
-        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            //gramatica.group("EstPrincipal", "PRINCIPAL Llav_abr (Sentencias|DeclaracionesF)* Llav_cer");
-
-            gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo Llav_abr (Sentencias | DeclaracionesF)* Llav_cer");
-
-            //gramatica.group("EstPrincipal", " Llav_abr (Sentencias|DeclaracionesF)* Llav_cer",
-            //36, "Error sintáctico (36): En la línea #, Falta palabra clave PRINCIPAL.");
-            //errores llaves metodos
-            gramatica.finalLineColumn();
-            gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo Llav_abr (Sentencias|DeclaracionesF)* ",
-                    34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
             gramatica.initialLineColumn();
-            gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo  (Sentencias)* Llav_cer ",
-                    34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
+            gramatica.group("EstControl", "(EstMientras |  EstRepetir | EstSi | EstSiNO) (Sentencias|DeclaracionesF)* Llav_cer",
+                34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
+        
+        
+      
+            
+           //**************************** METODOS CON SENTENCIAS ******************
 
-//        gramatica.group("EstPrincipal", "PRINCIPAL Llav_abr (DeclaracionMetodoSentencias)* Llav_cer",
-//                40, "Error sintáctico (40): En la línea #, No se pueden declarar metodos dentro de PRINCIPAL.");
-            gramatica.group("CuerpoClase", "(DeclaracionMetodoSentencias | Sentencias | DeclaracionesF)+");
-            gramatica.group("CuerpoClases", "(CuerpoClase| CuerpoClase CuerpoClases)");
-        });
+        //****************************** CUERPO DE CLASE *********************************************
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+        gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo Llav_abr (Sentencias | DeclaracionesF)* Llav_cer");
 
-        ////********************** CLASEEE ***********************
-        gramatica.group("EstClase", "CLASE (Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)* Llav_cer");
+        gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodoError (Sentencias | DeclaracionesF)* Llav_cer ",44,
+                     "Error sintáctico (44): En la línea #, Falta palabra clave para definir método.");
 
+             // Errores
+        gramatica.finalLineColumn(); 
+        gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo Llav_abr (Sentencias|DeclaracionesF)* ",
+                     34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
         gramatica.initialLineColumn();
+        gramatica.group("DeclaracionMetodoSentencias", "DeclaracionMetodo (Sentencias|DeclaracionesF)* Llav_cer ",
+                     34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");    
+        
+        gramatica.group("CuerpoClases", "(DeclaracionMetodoSentencias | CuerpoClases)");
+         });
 
+        
+        
+        ////********************** CLASEE ***********************
+        gramatica.group("EstClase", "CLASE (Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)* Llav_cer");
+        
+        gramatica.initialLineColumn();
+        
         gramatica.group("EstClase", "CLASE Llav_abr (CuerpoClases|DeclaracionesF)* Llav_cer",
                 35, "Error sintáctico (35): En la línea #, Falta nombrar a la clase.");
-
-        gramatica.group("EstClase", "CLASE Expresion (CuerpoClases|DeclaracionesF)* Llav_cer",
+        
+        gramatica.group("EstClase", "CLASE (Expresion|Identificador) (CuerpoClases|DeclaracionesF)* Llav_cer",
                 34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
-
-        gramatica.group("EstClase", "Expresion Llav_abr (CuerpoClases|DeclaracionesF)* Llav_cer",
+        
+        gramatica.group("EstClase", "(ERROR_1 |ERROR_7)* (Expresion|Identificador)(CuerpoClases|DeclaracionesF)* Llav_cer",
+                34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");  
+        
+        gramatica.group("EstClase", "(Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)* Llav_cer",
                 36, "Error sintáctico (36): En la línea #, Falta palabra clave CLASE.");
+              
 
-        gramatica.finalLineColumn();
+        gramatica.finalLineColumn(); 
+        
         gramatica.group("EstClase", "CLASE (Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)*",
+                34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
+        
+        gramatica.group("EstClase", " (ERROR_1 |ERROR_7)* (Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)*",
                 34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
 
         valoresIdent(idSValor);
-        defineMetodos(mets);
         meterListass(vectores);
 
         gramatica.show();
     }
 
+    
+    //****************************************** ANALISIS SEMANTICO ******************************************
     private void analisisSemantico() {
         HashMap<String, String> idTipoDato = new HashMap<>(); 
         idTipoDato.put("ENT","Numero_Entero | Numero_Mini");
@@ -1036,8 +1055,8 @@ public class Compilador extends javax.swing.JFrame {
         idTipoDato.put("COLOR", "Hexadecimal");
         idTipoDato.put("BOOL", "VERDADERO | FALSO");
         
-        
-        for(var id: identValor){ //VALIDAR el tipo de dato en las declaraciones asignadas
+    // -------------------------- ERROR SEMANTICO: Validar el tipo de dato y el dato asignado ------------------------
+        for(var id: identValor){ 
             if(!idTipoDato.get(id.lexemeRank(1)).equals(id.lexicalCompRank(-1)) && !(id.lexemeRank(1).equals("ENT") || id.lexemeRank(1).equals("BOOL"))){
                 errores.add(new ErrorLSSL(1,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
                 System.out.println("primer if"+id.lexemeRank(2));
@@ -1049,8 +1068,10 @@ public class Compilador extends javax.swing.JFrame {
                 System.out.println("Tercero alv"+id.lexemeRank(2));
             }
         }
-        
-        for(var p: asign){ //Validar que la variable este declarada en la asignacion y corresponda el tipo de dato
+     
+     
+     //-------- ERROR SEMANTICO: Validar que la variable este declarada en la asignacion y corresponda el tipo de dato -------
+        for(var p: asign){ 
             String id = p.lexemeRank(0);
             String valAs = p.lexicalCompRank(2);
             String td="";
@@ -1076,6 +1097,8 @@ public class Compilador extends javax.swing.JFrame {
         }
     }
 
+    
+   // ****************************** ARRAYLIST DE IDENTIFICADORES  *********************
     private void valoresIdent(ArrayList<Production> idVal) {
 
         for (Production id : identValor) {
@@ -1104,84 +1127,10 @@ public class Compilador extends javax.swing.JFrame {
         }
     }
 
-    private void defineMetodos(ArrayList<Production> mets) {
-        for (Production met : mets) {
-            String nom = met.lexemeRank(1);
-            StringBuilder pm = new StringBuilder();
-            int i = 3;
-            while (!met.lexemeRank(i).equals(")")) {
-                pm.append(met.lexemeRank(i)).append(" ");
-                i++;
-            }
+    
 
-            String[] parametros = pm.toString().trim().split(",");
-
-            // Clasificación de parámetros por prefijo
-            List<String> boolParams = new ArrayList<>();
-            List<String> miniParams = new ArrayList<>();
-            List<String> entParams = new ArrayList<>();
-            List<String> decParams = new ArrayList<>();
-            List<String> cadParams = new ArrayList<>();
-            List<String> frecParams = new ArrayList<>();
-            List<String> colorParams = new ArrayList<>();
-
-            for (String param : parametros) {
-                param = param.trim();
-                if (param.startsWith("BOOL")) {
-                    boolParams.add(param);
-                } else if (param.startsWith("MINI")) {
-                    miniParams.add(param);
-                } else if (param.startsWith("ENT")) {
-                    entParams.add(param);
-                } else if (param.startsWith("DEC")) {
-                    decParams.add(param);
-                } else if (param.startsWith("CAD")) {
-                    cadParams.add(param);
-                } else if (param.startsWith("FREC")) {
-                    frecParams.add(param);
-                } else if (param.startsWith("COLOR")) {
-                    colorParams.add(param);
-                }
-                for (var s : simbolos) {
-                    if (param.endsWith(s[0])) {
-                        simbolos.remove(simbolos.indexOf(s));
-                        break;
-                    }
-                }
-            }
-
-            // Combina los parámetros ordenados
-            List<String> sortedParams = new ArrayList<>();//Modificar esto
-            sortedParams.addAll(boolParams);
-            sortedParams.addAll(miniParams);
-            sortedParams.addAll(entParams);
-            sortedParams.addAll(decParams);
-            sortedParams.addAll(cadParams);
-            sortedParams.addAll(frecParams);
-            sortedParams.addAll(colorParams);
-
-            //List<Integer> acum = new ArrayList<>();
-            for (var s : simbolos) {
-                if (s[0].equals(nom)) {
-                    String[] metodo = new String[1 + sortedParams.size()];
-                    metodo[0] = nom;
-
-                    for (int j = 0; j < sortedParams.size(); j++) {
-                        metodo[1 + j] = sortedParams.get(j);
-
-                    }
-
-                    metodos.add(metodo);
-                    simbolos.remove(simbolos.indexOf(s));
-                    break;
-                }
-            }
-
-        }
-    }
-
-    private void meterListass(ArrayList<Production> list) {
-        for (Production l : list) {
+    private void meterListass(ArrayList<Production> vect) {
+        for (Production l : vect) {
             String nom = l.lexemeRank(2);
             StringBuilder valBuilder = new StringBuilder(); // VECT0 TD1 ID2 =3 [4 val5];VECT0 TD1 id2 [3 N4 ]5
             int x = 5;
@@ -1236,6 +1185,8 @@ public class Compilador extends javax.swing.JFrame {
         Functions.colorTextPane(textocolor, areaCodigo, new Color(40, 40, 40));
     }
 
+    
+    // ******************************************* TABLA DE TOKENS ***********************************
     private void TablaTokens() {
 
         tokens.forEach(token -> {
@@ -1385,7 +1336,6 @@ public class Compilador extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
