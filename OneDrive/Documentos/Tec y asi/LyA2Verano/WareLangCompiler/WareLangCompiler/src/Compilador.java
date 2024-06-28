@@ -62,6 +62,7 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> identValor;//DECLARACION con valorr
     private ArrayList<Production> asign;
     private ArrayList<Production> FuncionesMovimiento;
+    private ArrayList<Production> idSValor;
 
     /**
      * Creates new form Compilador
@@ -117,6 +118,8 @@ public class Compilador extends javax.swing.JFrame {
         identValor = new ArrayList<>();//Asignacion con valor
         asign = new ArrayList<>();
         FuncionesMovimiento = new ArrayList<>();
+        idSValor = new ArrayList<>();
+
 
         errores = new ArrayList();
         textocolor = new ArrayList<>();
@@ -844,8 +847,29 @@ public class Compilador extends javax.swing.JFrame {
         
         //*************************** VER **************************************************
         gramatica.group("EstVER","(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_abr Par_cer");
+        //ERRORES
+        gramatica.group("EstVER","(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_abr (Par_abr)+ Par_cer", 49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
+        
+        gramatica.group("EstVER","(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_abr  (Par_cer)+ Par_cer ", 49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
+        
+         gramatica.group("EstVER", "(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_abr ",11,
+                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis.");
+         
+        gramatica.group("EstVER", "(VerAdelante | VerAtras | VerDerecha | VerIzquierda) Par_cer ",11,
+                "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis.");
+        
+        gramatica.group("EstVER","(VerAdelante | VerAtras | VerDerecha | VerIzquierda)", 57,
+                "Error sintáctico (49): En la línea #, Faltan parentésis depúes de la palabra reservada.");
+        
+        gramatica.group("EstVER","(VerAdelante | VerAtras | VerDerecha | VerIzquierda)"
+                + " Par_abr (Valor | Numero| Identificador) Par_cer", 50,
+                "Error sintáctico (50): En la línea #, Sintaxis de método incorrecta.");
+        
         gramatica.group("LlamadaCond", "(EstRevisar | EstVER)");
-  
+        
+        
         
          
        //***************************************** ASIGNACIONES *************************
@@ -1147,6 +1171,26 @@ public class Compilador extends javax.swing.JFrame {
             }
 
         }//errorMovimiento
+        
+        
+        //ERROR SEMANTICO 5: declaracion de variable repetida.
+        ArrayList<Production> declaracion = identValor;
+        
+        declaracion.addAll(idSValor);
+        
+        for(var a: declaracion){
+            
+            for(var s: declaracion.subList(declaracion.indexOf(a)+1, declaracion.size() )){
+                    if(a.lexemeRank(2).equals(s.lexemeRank(2)) ){
+                        
+                        errores.add(new ErrorLSSL(5,"Error Semantico {} en la linea #, declaración de una variable previamente declarada",s,true ));
+                        System.out.println("primer if"+a.lexemeRank(2));
+                        break;
+                    }
+                
+            }
+        }
+
 
      
     }//fin semantico
@@ -1324,6 +1368,7 @@ public class Compilador extends javax.swing.JFrame {
         FuncionesMovimiento.clear();
         identValor.clear();
         asign.clear();
+        idSValor.clear();
     }
 
     private void appendToPane(JTextPane tp, String msg, Color c) {
