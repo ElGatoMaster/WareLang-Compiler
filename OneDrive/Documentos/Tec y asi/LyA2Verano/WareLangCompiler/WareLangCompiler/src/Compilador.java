@@ -49,7 +49,7 @@ public class Compilador extends javax.swing.JFrame {
     private Timer timerKeyReleased; //pintar
 
     private boolean estadoCompilacion = false;
-    private TablaSimbolosIdent tabla;
+    private tablaSimbolosIdent tabla;
     private tablaListas tablaV;
     private tablaTokens tablaT;
 
@@ -83,7 +83,7 @@ public class Compilador extends javax.swing.JFrame {
     private void init() {
         titulo = "WareLangCompiler";
         setLocationRelativeTo(null);
-        tabla = new TablaSimbolosIdent(this, true);
+        tabla = new tablaSimbolosIdent(this, true);
         tablaV = new tablaListas(this, true);
         tablaT = new tablaTokens(this, true);
 
