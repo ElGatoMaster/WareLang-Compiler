@@ -63,6 +63,7 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> asign;
     private ArrayList<Production> FuncionesMovimiento;
     private ArrayList<Production> idSValor;
+    private ArrayList<Production> decVecVal;
 
     /**
      * Creates new form Compilador
@@ -120,6 +121,7 @@ public class Compilador extends javax.swing.JFrame {
         FuncionesMovimiento = new ArrayList<>();
         idSValor = new ArrayList<>();
 
+        decVecVal = new ArrayList<>();
 
         errores = new ArrayList();
         textocolor = new ArrayList<>();
@@ -479,10 +481,10 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr Numero Corch_cer ",vectores);
        
         gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Op_asignacion Corch_abr"
-                + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ",vectores);
-        
-          //Errores
-          gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion  Corch_abr (Corch_abr)+"
+                + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ", decVecVal);
+
+        //Errores
+        gramatica.group("DeclaracionVect", " VECTOR TipoDato Identificador Op_asignacion  Corch_abr (Corch_abr)+"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)* (Corch_cer)+", 51,
                 "Error sintáctico (51): En la línea #, Existen corchetes de más.");
         
@@ -1099,14 +1101,36 @@ public class Compilador extends javax.swing.JFrame {
                 errores.add(new ErrorLSSL(54,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
                 System.out.println("segundo"+id.lexemeRank(2));
             }else if(id.lexemeRank(1).equals("BOOL") && !(id.lexicalCompRank(-1).equals("Verdadero") || id.lexicalCompRank(-1).equals("Falso")) ){
-                errores.add(new ErrorLSSL(54,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
-                System.out.println("Tercero alv"+id.lexemeRank(2));
+                errores.add(new ErrorLSSL(1,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
             }
         }
-     
-     
-     //-------- ERROR SEMANTICO: Validar que la variable este declarada en la asignacion y corresponda el tipo de dato -------
-        for(var p: asign){ 
+        
+        //Tipo de Dato no valido en la declaracion de un vector
+        //VECT TD id OpAsig CorchA valores CorchC
+        for(Production v:decVecVal){
+            String nom = v.lexemeRank(2);
+            String td = v.lexemeRank(1);    // VECT0 TD1 ID2 =3 [4 val5];VECT0 TD1 id2 [3 N4 ]5
+            int x = 5;
+            while (!v.lexemeRank(x).equals("]")) {
+                if(!v.lexicalCompRank(x).equals("Coma")){
+                    if (!idTipoDato.get(td).equals(v.lexicalCompRank(x)) && !(v.lexemeRank(1).equals("ENT") || v.lexemeRank(1).equals("BOOL"))) {
+                        errores.add(new ErrorLSSL(3, "Error Semantico {} en la linea #, no corresponde 1 o mas de los valores asignados al arreglo", v, true));
+                        break;
+                    } else if (v.lexemeRank(1).equals("ENT") && !(v.lexicalCompRank(x).equals("Numero_Entero") || v.lexicalCompRank(x).equals("Numero_Mini"))) {
+                        errores.add(new ErrorLSSL(3, "Error Semantico {} en la linea #, no corresponde 1 o mas de los valores asignados al arreglo", v, true));
+                        break;
+                    } else if (v.lexemeRank(1).equals("BOOL") && !(v.lexicalCompRank(x).equals("Verdadero") || v.lexicalCompRank(x).equals("Falso"))) {
+                        errores.add(new ErrorLSSL(3, "Error Semantico {} en la linea #, no corresponde 1 o mas de los valores asignados al arreglo", v, true));
+                        break;
+                    }
+                }
+                x++;
+            }
+            
+        }
+        
+        // id0 opAsig1 Valor2 ;
+        for(var p: asign){ //Validar que la variable este declarada en la asignacion y corresponda el tipo de dato
             String id = p.lexemeRank(0);
             String valAs = p.lexicalCompRank(2);
             String td="";
@@ -1116,7 +1140,7 @@ public class Compilador extends javax.swing.JFrame {
                     
                 }else if(s[0].equals(id)){
                     td = s[1].trim();
-                    System.out.println(td+" "+valAs);
+                    
                 }
             }
             if(!td.equals("")){
@@ -1128,7 +1152,6 @@ public class Compilador extends javax.swing.JFrame {
                     errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
                 }
             }
-            
         }
     
       //-------- ERROR SEMANTICO: Validar que la variable o valor sea congruente con el método -------
@@ -1368,6 +1391,7 @@ public class Compilador extends javax.swing.JFrame {
         FuncionesMovimiento.clear();
         identValor.clear();
         asign.clear();
+        decVecVal.clear();
         idSValor.clear();
     }
 
