@@ -64,6 +64,9 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> FuncionesMovimiento;
     private ArrayList<Production> idSValor;
     private ArrayList<Production> decVecVal;
+    private ArrayList<Production> FuncionAlarma;
+    private ArrayList<Production> FuncionCaja;
+
 
     /**
      * Creates new form Compilador
@@ -120,6 +123,8 @@ public class Compilador extends javax.swing.JFrame {
         asign = new ArrayList<>();
         FuncionesMovimiento = new ArrayList<>();
         idSValor = new ArrayList<>();
+        FuncionAlarma = new ArrayList<>();
+        FuncionCaja = new ArrayList<>();
 
         decVecVal = new ArrayList<>();
 
@@ -632,8 +637,8 @@ public class Compilador extends javax.swing.JFrame {
 
                 
         //********************************** EST ALARMA ***************************
-        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador) Par_cer");
-        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Numero) Par_cer");
+        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Identificador) Par_cer",FuncionAlarma);
+        gramatica.group("EstAlarma", "F_ALARMA Par_abr (Numero|Valor) Par_cer",FuncionAlarma);
        
         // ERRORES ALARMA
         gramatica.group("EstAlarma", "F_ALARMA Par_abr Par_cer", 20,
@@ -712,7 +717,7 @@ public class Compilador extends javax.swing.JFrame {
         
         //********************************* EST CAJA *******************************
 
-        gramatica.group("EstCaja", "F_CAJA Par_abr (Identificador | Numero) Par_cer");
+        gramatica.group("EstCaja", "F_CAJA Par_abr (Identificador |Valor| Numero) Par_cer", FuncionCaja);
         // ERRORES CAJa 
         gramatica.group("EstCaja", "F_CAJA ", 11,
                 "Error sintáctico (11): En la línea #, Falta abrir o cerrar paréntesis ().");
@@ -1156,6 +1161,7 @@ public class Compilador extends javax.swing.JFrame {
     
       //-------- ERROR SEMANTICO: Validar que la variable o valor sea congruente con el método -------
  
+       //******************** METODOS DE MOVIMIENTO *****************
        //Velocidades para métodos de movimiento
         
         ArrayList<String> Velocidades = new ArrayList<>();
@@ -1194,6 +1200,66 @@ public class Compilador extends javax.swing.JFrame {
             }
 
         }//errorMovimiento
+
+        //******************** MÉTODO ALARMA *******************
+        
+        for (Production Alarma: FuncionAlarma) {
+            String id = Alarma.lexemeRank(2);
+            String td = "";
+
+            if (Alarma.lexicalCompRank(2).equals("Identificador")) {
+
+                for (var s : simbolos) {
+                    if (s[0].equals(id) && (s[1] == null)) {
+                        errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Alarma, true));
+                        break;
+
+                    } else if(s[0].equals(id) && !(s[1] == null)){
+                        td = s[1].trim();
+                        if (!(td.equals("FREC"))) {
+                            errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
+                                    + "parámetro esperado por el método", Alarma, true));
+                            break;
+                        }
+                    }
+                }//for simbolos
+
+            } else if (!Alarma.lexicalCompRank(2).equals("Numero_Entero")
+                    && !Alarma.lexicalCompRank(2).equals("Numero_Mini")) {
+                    errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Alarma, true));
+
+            }
+        }//alarma
+        
+        
+        //******************** MÉTODO CAJA *******************
+        
+        for (Production Caja: FuncionCaja) {
+            String id = Caja.lexemeRank(2);
+            String td = "";
+
+            if (Caja.lexicalCompRank(2).equals("Identificador")) {
+
+                for (var s : simbolos) {
+                    if (s[0].equals(id) && (s[1] == null)) {
+                        errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Caja, true));
+                        break;
+
+                    } else if(s[0].equals(id) && !(s[1] == null)){
+                        td = s[1].trim();
+                        if (!(td.equals("DEC"))) {
+                            errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
+                                    + "parámetro esperado por el método", Caja, true));
+                            break;
+                        }
+                    }
+                }//for simbolos
+
+            } else if (!Caja.lexicalCompRank(2).equals("Numero_Decimal")) {
+                    errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Caja, true));
+
+            }
+        }//caja
         
         
         //ERROR SEMANTICO 5: declaracion de variable repetida.
@@ -1390,6 +1456,8 @@ public class Compilador extends javax.swing.JFrame {
         
         FuncionesMovimiento.clear();
         identValor.clear();
+        FuncionAlarma.clear();
+        FuncionCaja.clear();
         asign.clear();
         decVecVal.clear();
         idSValor.clear();
