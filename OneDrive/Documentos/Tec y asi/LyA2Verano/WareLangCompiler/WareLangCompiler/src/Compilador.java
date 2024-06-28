@@ -49,7 +49,7 @@ public class Compilador extends javax.swing.JFrame {
     private Timer timerKeyReleased; //pintar
 
     private boolean estadoCompilacion = false;
-    private tablaSimbolosIdent tabla;
+    private TablaSimbolosIdent tabla;
     private tablaListas tablaV;
     private tablaTokens tablaT;
 
@@ -80,7 +80,7 @@ public class Compilador extends javax.swing.JFrame {
     private void init() {
         titulo = "WareLangCompiler";
         setLocationRelativeTo(null);
-        tabla = new tablaSimbolosIdent(this, true);
+        tabla = new TablaSimbolosIdent(this, true);
         tablaV = new tablaListas(this, true);
         tablaT = new tablaTokens(this, true);
 
@@ -434,8 +434,7 @@ public class Compilador extends javax.swing.JFrame {
 
     private void analisisSintactico() {
         Grammar gramatica = new Grammar(tokens, errores);
-
-        ArrayList<Production> idSValor = new ArrayList<>();
+        
         ArrayList<Production> mets = new ArrayList<>();
         ArrayList<Production> vectores = new ArrayList<>();
         
@@ -1108,7 +1107,7 @@ public class Compilador extends javax.swing.JFrame {
         //Tipo de Dato no valido en la declaracion de un vector
         //VECT TD id OpAsig CorchA valores CorchC
         for(Production v:decVecVal){
-            String nom = v.lexemeRank(2);
+            
             String td = v.lexemeRank(1);    // VECT0 TD1 ID2 =3 [4 val5];VECT0 TD1 id2 [3 N4 ]5
             int x = 5;
             while (!v.lexemeRank(x).equals("]")) {
@@ -1129,8 +1128,9 @@ public class Compilador extends javax.swing.JFrame {
             
         }
         
-        // id0 opAsig1 Valor2 ;
-        for(var p: asign){ //Validar que la variable este declarada en la asignacion y corresponda el tipo de dato
+        
+        //Validar que la variable este declarada en la asignacion y corresponda el tipo de dato
+        for(var p: asign){ 
             String id = p.lexemeRank(0);
             String valAs = p.lexicalCompRank(2);
             String td="";
@@ -1206,7 +1206,7 @@ public class Compilador extends javax.swing.JFrame {
             for(var s: declaracion.subList(declaracion.indexOf(a)+1, declaracion.size() )){
                     if(a.lexemeRank(2).equals(s.lexemeRank(2)) ){
                         
-                        errores.add(new ErrorLSSL(5,"Error Semantico {} en la linea #, declaración de una variable previamente declarada",s,true ));
+                        errores.add(new ErrorLSSL(5,"Error Semantico {} en la linea #, declaración de una variable previamente declarada",a,true ));
                         System.out.println("primer if"+a.lexemeRank(2));
                         break;
                     }
@@ -1239,7 +1239,7 @@ public class Compilador extends javax.swing.JFrame {
             String tipoDato = id.lexemeRank(1);
             String nombre = id.lexemeRank(2);
             for (var sim : simbolos) {
-                if (sim[0].equals(nombre)) {
+                if (sim[0].equals(nombre) && (sim[1]==null)) {
                     sim[1] = tipoDato;
                     simbolos.set(simbolos.indexOf(sim), sim);
                     break;

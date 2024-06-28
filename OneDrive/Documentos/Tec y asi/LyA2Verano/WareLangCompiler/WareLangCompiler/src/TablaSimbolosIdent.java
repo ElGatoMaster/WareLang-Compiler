@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author rebek
  */
-public class tablaListas extends javax.swing.JDialog {
+public class TablaSimbolosIdent extends javax.swing.JDialog {
   DefaultTableModel tabla = new DefaultTableModel();
     private ArrayList<String[]> simbolos;
     
@@ -22,8 +22,8 @@ public class tablaListas extends javax.swing.JDialog {
      * Creates new form tablaSimbolo
      */
     
-    public tablaListas(java.awt.Frame parent, boolean modal) {
-        super(parent,"Tabla de Simbolos Listas", modal);
+    public TablaSimbolosIdent(java.awt.Frame parent, boolean modal) {
+        super(parent,"Tabla de Simbolos Identificadores", modal);
         initComponents();
         setLocationRelativeTo(parent); 
     }
@@ -34,7 +34,7 @@ public class tablaListas extends javax.swing.JDialog {
     
     public void llenarTabla(){
         
-        String columna[] = {"Identificador","Tipo de Dato","Valor", "Valor", "Valor", "Valor", "Valor", "Valor", "Valor", "Valor"};
+        String columna[] = {"Identificador","Tipo de Dato","Valor", "Declaración"};
         tabla.setColumnIdentifiers(columna); 
 
         
@@ -81,17 +81,17 @@ public class tablaListas extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(44, 44, 44)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(52, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(62, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(54, 54, 54))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(12, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -122,6 +122,12 @@ public class tablaListas extends javax.swing.JDialog {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(TablaSimbolosIdent.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
