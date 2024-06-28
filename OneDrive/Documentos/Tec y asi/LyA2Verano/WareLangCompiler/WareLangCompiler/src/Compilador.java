@@ -61,6 +61,7 @@ public class Compilador extends javax.swing.JFrame {
     //PARA EL SEMANTICO
     private ArrayList<Production> identValor;//DECLARACION con valorr
     private ArrayList<Production> asign;
+    private ArrayList<Production> FuncionesMovimiento;
 
     /**
      * Creates new form Compilador
@@ -115,6 +116,7 @@ public class Compilador extends javax.swing.JFrame {
         //modificacion para hacer el semantico
         identValor = new ArrayList<>();//Asignacion con valor
         asign = new ArrayList<>();
+        FuncionesMovimiento = new ArrayList<>();
 
         errores = new ArrayList();
         textocolor = new ArrayList<>();
@@ -431,6 +433,7 @@ public class Compilador extends javax.swing.JFrame {
         ArrayList<Production> idSValor = new ArrayList<>();
         ArrayList<Production> mets = new ArrayList<>();
         ArrayList<Production> vectores = new ArrayList<>();
+        
 
         //Eliminacin de errores Lexicos
         gramatica.delete("ERROR", 1, "Error léxico ({}): En la línea #, Cadena inválida");
@@ -462,6 +465,9 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("OpLog", "(OpLog_Y | OpLog_O | OpLgo_NO)");
         gramatica.group("OpImpr", "(CONSOL| LCD)");
         gramatica.group("MetodoSP", "F_SOLTAR | APAGAR | PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR ");
+        gramatica.group("Metodo", "F_SOLTAR | APAGAR | PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR ");
+        
+
         
 
         //***************************************** VECTORES *******************************
@@ -650,6 +656,55 @@ public class Compilador extends javax.swing.JFrame {
         
         gramatica.finalLineColumn();
         
+            //************************************  F_MOVIMIENTO    ****************************
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr (Identificador | Valor  | Numero ) Coma (Identificador | Valor | Numero ) Par_cer", FuncionesMovimiento);
+        
+                
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr  Coma (Numero | Identificador) Par_cer  ",20,
+                "Error sintáctico (23): En la línea #, Falta un valor en método."); 
+        
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr (Numero| Identificador) (Coma)+ (Numero | Identificador) Par_cer ",55,
+                    "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas (,) de más");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr (Numero| Identificador) Coma Par_cer  ",20,
+                "Error sintáctico (23): En la línea #, Falta un valor en método.");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) (Par_abr)+ (Numero| Identificador)"
+                + " Coma (Numero | Identificador) Par_cer Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) Par_abr Par_abr (Par_abr)+ "
+                + " (Numero| Identificador) Coma (Numero | Identificador) (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
+  
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr  Coma  Par_cer  ",20,
+                "Error sintáctico (23): En la línea #, Falta un valor en método.");
+         
+         gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr  Par_cer ",43,
+                "Error sintáctico (43): En la línea #, Faltan valores en el método");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + "Par_abr (Numero| Identificador) Coma (Numero | Identificador) ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
+                + " (Numero| Identificador) Coma (Numero | Identificador) Par_cer  ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+
+       gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA)",19,
+                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
+
+       
+        gramatica.finalLineColumn();
+        
         
         //********************************* EST CAJA *******************************
 
@@ -718,54 +773,7 @@ public class Compilador extends javax.swing.JFrame {
         
  
         
-        //************************************  F_MOVIMIENTO    ****************************
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr (Numero| Identificador) Coma (Numero | Identificador) Par_cer ");
-        
-                
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr  Coma (Numero | Identificador) Par_cer  ",20,
-                "Error sintáctico (23): En la línea #, Falta un valor en método."); 
-        
-        
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr (Numero| Identificador) (Coma)+ (Numero | Identificador) Par_cer ",55,
-                    "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas (,) de más");
-        
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr (Numero| Identificador) Coma Par_cer  ",20,
-                "Error sintáctico (23): En la línea #, Falta un valor en método.");
-        
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) (Par_abr)+ (Numero| Identificador)"
-                + " Coma (Numero | Identificador) Par_cer Par_cer (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) Par_abr Par_abr (Par_abr)+ "
-                + " (Numero| Identificador) Coma (Numero | Identificador) (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más.");
-  
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr  Coma  Par_cer  ",20,
-                "Error sintáctico (23): En la línea #, Falta un valor en método.");
-         
-         gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr  Par_cer ",43,
-                "Error sintáctico (43): En la línea #, Faltan valores en el método");
-        
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + "Par_abr (Numero| Identificador) Coma (Numero | Identificador) ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) "
-                + " (Numero| Identificador) Coma (Numero | Identificador) Par_cer  ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-
-       gramatica.group("F_MOV", "(F_ADELANTE | F_ATRAS | F_DERECHA | F_IZQUIERDA) ",19,
-                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-
-       
-        gramatica.finalLineColumn();
+    
         
         
        
@@ -956,12 +964,12 @@ public class Compilador extends javax.swing.JFrame {
         
         
         //ERRORES SINGULARES 
-        
-        gramatica.group("ERRORES", "Par_abr Par_cer Punto_coma",49,
-                "Error sintáctico (49): En la línea #, Falta palabra reservada."); 
-            
-         gramatica.group("ERRORES", "(ERROR_1 | ERROR_7) Par_abr Par_cer Punto_coma",49,
-                "Error sintáctico (49): En la línea #, Falta palabra reservada"); 
+//        
+//        gramatica.group("ERRORES", "Par_abr Par_cer Punto_coma",49,
+//                "Error sintáctico (49): En la línea #, Falta palabra reservada."); 
+//            
+//         gramatica.group("ERRORES", "(ERROR_1 | ERROR_7) Par_abr Par_cer Punto_coma",49,
+//                "Error sintáctico (49): En la línea #, Falta palabra reservada"); 
 
 
         // *********************** AGRUPACION DE SENTENCIAS **********************
@@ -1046,6 +1054,7 @@ public class Compilador extends javax.swing.JFrame {
     
     //****************************************** ANALISIS SEMANTICO ******************************************
     private void analisisSemantico() {
+        //Asociar tipo de datos
         HashMap<String, String> idTipoDato = new HashMap<>(); 
         idTipoDato.put("ENT","Numero_Entero | Numero_Mini");
         idTipoDato.put("MINI", "Numero_Mini");
@@ -1055,16 +1064,18 @@ public class Compilador extends javax.swing.JFrame {
         idTipoDato.put("COLOR", "Hexadecimal");
         idTipoDato.put("BOOL", "VERDADERO | FALSO");
         
+        
+        
     // -------------------------- ERROR SEMANTICO: Validar el tipo de dato y el dato asignado ------------------------
         for(var id: identValor){ 
             if(!idTipoDato.get(id.lexemeRank(1)).equals(id.lexicalCompRank(-1)) && !(id.lexemeRank(1).equals("ENT") || id.lexemeRank(1).equals("BOOL"))){
-                errores.add(new ErrorLSSL(1,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
+                errores.add(new ErrorLSSL(54,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
                 System.out.println("primer if"+id.lexemeRank(2));
             }else if(id.lexemeRank(1).equals("ENT") && !(id.lexicalCompRank(-1).equals("Numero_Entero") || id.lexicalCompRank(-1).equals("Numero_Mini")) ){
-                errores.add(new ErrorLSSL(1,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
+                errores.add(new ErrorLSSL(54,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
                 System.out.println("segundo"+id.lexemeRank(2));
             }else if(id.lexemeRank(1).equals("BOOL") && !(id.lexicalCompRank(-1).equals("Verdadero") || id.lexicalCompRank(-1).equals("Falso")) ){
-                errores.add(new ErrorLSSL(1,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
+                errores.add(new ErrorLSSL(54,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
                 System.out.println("Tercero alv"+id.lexemeRank(2));
             }
         }
@@ -1077,7 +1088,7 @@ public class Compilador extends javax.swing.JFrame {
             String td="";
             for(var s:simbolos){
                 if(s[0].equals(id) && s[1]==null){
-                    errores.add(new ErrorLSSL(2,"Error Semantico {} en la linea #, la variable no ha sido declarada",p,true  ));
+                    errores.add(new ErrorLSSL(55,"Error Semantico {} en la linea #, la variable no ha sido declarada",p,true  ));
                     
                 }else if(s[0].equals(id)){
                     td = s[1].trim();
@@ -1086,16 +1097,59 @@ public class Compilador extends javax.swing.JFrame {
             }
             if(!td.equals("")){
                 if (!idTipoDato.get(td).equals(valAs) && !(td.equals("BOOL") || td.equals("ENT"))) {
-                    errores.add(new ErrorLSSL(1, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
+                    errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
                 } else if (td.equals("ENT") && !(valAs.equals("Numero_Entero") || valAs.equals("Numero_Mini"))) {
-                    errores.add(new ErrorLSSL(1, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
+                    errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
                 } else if (td.equals("BOOL") && !(valAs.equals("Verdadero") || valAs.equals("Falso"))) {
-                    errores.add(new ErrorLSSL(1, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
+                    errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
                 }
             }
             
         }
-    }
+    
+      //-------- ERROR SEMANTICO: Validar que la variable o valor sea congruente con el método -------
+ 
+       //Velocidades para métodos de movimiento
+        
+        ArrayList<String> Velocidades = new ArrayList<>();
+        Velocidades.add("1");
+        Velocidades.add("2");
+        Velocidades.add("3");
+    
+        for (Production Movimiento : FuncionesMovimiento) {
+            String id = Movimiento.lexemeRank(2);
+            String td = "";
+
+            if (Movimiento.lexicalCompRank(2).equals("Identificador")) {
+
+                for (var s : simbolos) {
+                    if (s[0].equals(id) && (s[1] == null)) {
+                        errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Movimiento, true));
+                        break;
+
+                    } else if(s[0].equals(id) && !(s[1] == null)){
+                        td = s[1].trim();
+                        if (!(td.equals("MINI") || td.equals("ENT"))) {
+                            errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
+                                    + "parámetro esperado por el método", Movimiento, true));
+                            break;
+                        }
+                    }
+                }//for simbolos
+
+            } else if (!Movimiento.lexicalCompRank(2).equals("Numero_Entero")
+                    && !Movimiento.lexicalCompRank(2).equals("Numero_Mini")) {
+                errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Movimiento, true));
+
+            }
+            if (!Velocidades.contains(Movimiento.lexemeRank(4))) {
+                errores.add(new ErrorLSSL(57, "Error Semantico {} en la linea #, '" + Movimiento.lexemeRank(4) + "' debe de ser velocidad 1(lenta), 2(media) o 3(rápida)", Movimiento, true));
+            }
+
+        }//errorMovimiento
+
+     
+    }//fin semantico
 
     
    // ****************************** ARRAYLIST DE IDENTIFICADORES  *********************
@@ -1267,6 +1321,7 @@ public class Compilador extends javax.swing.JFrame {
         lisTokens.clear();
         estadoCompilacion = false;
         
+        FuncionesMovimiento.clear();
         identValor.clear();
         asign.clear();
     }
