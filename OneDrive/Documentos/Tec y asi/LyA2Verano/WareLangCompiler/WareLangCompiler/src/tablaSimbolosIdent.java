@@ -34,11 +34,10 @@ public class tablaSimbolosIdent extends javax.swing.JDialog {
     
     public void llenarTabla(){
         
-        String columna[] = {"Identificador","Tipo de Dato", "Declarado", "Referencias"};
-        tabla.setColumnIdentifiers(columna); 
+        String columna[] = {"Identificador", "Tipo de Dato", "Valor", "Declarado", "Referencias"};
+        tabla.setColumnIdentifiers(columna);
 
-        
-         int rowCount = tabla.getRowCount();
+        int rowCount = tabla.getRowCount();
         for (int i = rowCount - 1; i >= 0; i--) {
             tabla.removeRow(i);
         }
@@ -47,9 +46,9 @@ public class tablaSimbolosIdent extends javax.swing.JDialog {
         simbolos.forEach(simbolo -> {
             Functions.addRowDataInTable(jTabla, simbolo);
         });
-        
-    }
 
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

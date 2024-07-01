@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java_cup.production;
@@ -66,7 +67,7 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> decVecVal;
     private ArrayList<Production> FuncionAlarma;
     private ArrayList<Production> FuncionCaja;
-
+   
 
     /**
      * Creates new form Compilador
@@ -127,7 +128,8 @@ public class Compilador extends javax.swing.JFrame {
         FuncionCaja = new ArrayList<>();
 
         decVecVal = new ArrayList<>();
-
+        
+        
         errores = new ArrayList();
         textocolor = new ArrayList<>();
 
@@ -407,27 +409,27 @@ public class Compilador extends javax.swing.JFrame {
                 if (token == null) {
                     break;
                 }
-                if (token.getLexicalComp().equals("Identificador")) {
-                    boolean repetido = false;
-                    // Verificar si el lexema del token está repetido en los símbolos
-                    for (String[] simbolo : simbolos) {
-                        if (simbolo[0].equals(token.getLexeme())) {
-                            simbolo[4] += token.getLine() + ",";
-                            simbolos.set(simbolos.indexOf(simbolo), simbolo);
-                            repetido = true;
-                            break;
-                        }
-                    }
-                    // Si no está repetido, agregar el token a los símbolos
-                    if (!repetido) {
-                        //identificador,tipodeDato,lineaDeclaracion,lineas referenciadas
-                        simbolos.add(new String[]{token.getLexeme(), null, null, token.getLine() + "", ""});
-                    }
-                }
-
-                if (token.getLexicalComp().equals("Palabra_Reservada_Met")) {
-                    metodos.add(new String[]{token.getLexeme(), "", "", String.valueOf(token.getLine())});
-                }
+//                if (token.getLexicalComp().equals("Identificador")) {
+//                    boolean repetido = false;
+//                    // Verificar si el lexema del token está repetido en los símbolos
+//                    for (String[] simbolo : simbolos) {
+//                        if (simbolo[0].equals(token.getLexeme())) {
+//                            simbolo[4] += token.getLine() + ",";
+//                            simbolos.set(simbolos.indexOf(simbolo), simbolo);
+//                            repetido = true;
+//                            break;
+//                        }yvan
+//                    }
+//                    // Si no está repetido, agregar el token a los símbolos
+//                    if (!repetido) {
+//                        //identificador,tipodeDato,lineaDeclaracion,lineas referenciadas
+//                        simbolos.add(new String[]{token.getLexeme(), null, null, token.getLine() + "", ""});
+//                    }
+//                }
+//
+//                if (token.getLexicalComp().equals("Palabra_Reservada_Met")) {
+//                    metodos.add(new String[]{token.getLexeme(), "", "", String.valueOf(token.getLine())});
+//                }
                 tokens.add(token);
             }
         } catch (FileNotFoundException ex) {
@@ -441,7 +443,7 @@ public class Compilador extends javax.swing.JFrame {
         Grammar gramatica = new Grammar(tokens, errores);
         
         ArrayList<Production> mets = new ArrayList<>();
-        ArrayList<Production> vectores = new ArrayList<>();
+        
         
 
         //Eliminacin de errores Lexicos
@@ -482,7 +484,7 @@ public class Compilador extends javax.swing.JFrame {
         //***************************************** VECTORES *******************************
         
         
-        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr Numero Corch_cer ",vectores);
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr Numero Corch_cer ",decVecVal);
        
         gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Op_asignacion Corch_abr"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ", decVecVal);
@@ -1075,9 +1077,7 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("EstClase", " (ERROR_1 |ERROR_7)* (Expresion|Identificador) Llav_abr (CuerpoClases|DeclaracionesF)*",
                 34, "Error sintáctico (34): En la línea #, Falta abrir o cerrar }{ llaves.");
 
-        valoresIdent(idSValor);
-        meterListass(vectores);
-
+        
         gramatica.show();
     }
 
@@ -1094,29 +1094,74 @@ public class Compilador extends javax.swing.JFrame {
         idTipoDato.put("COLOR", "Hexadecimal");
         idTipoDato.put("BOOL", "VERDADERO | FALSO");
         
-        
-        
     // -------------------------- ERROR SEMANTICO: Validar el tipo de dato y el dato asignado ------------------------
         for(var id: identValor){ 
             if(!idTipoDato.get(id.lexemeRank(1)).equals(id.lexicalCompRank(-1)) && !(id.lexemeRank(1).equals("ENT") || id.lexemeRank(1).equals("BOOL"))){
                 errores.add(new ErrorLSSL(54,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
-                System.out.println("primer if"+id.lexemeRank(2));
+                
             }else if(id.lexemeRank(1).equals("ENT") && !(id.lexicalCompRank(-1).equals("Numero_Entero") || id.lexicalCompRank(-1).equals("Numero_Mini")) ){
                 errores.add(new ErrorLSSL(54,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
-                System.out.println("segundo"+id.lexemeRank(2));
+                
             }else if(id.lexemeRank(1).equals("BOOL") && !(id.lexicalCompRank(-1).equals("Verdadero") || id.lexicalCompRank(-1).equals("Falso")) ){
                 errores.add(new ErrorLSSL(1,"Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato",id,true  ));
+                
+            }else{
+                //Insertar las variables en la tabla de simbolos, y ver si estan repetidos
+                String tipo_dato = id.lexemeRank(1);
+                String identificador = id.lexemeRank(2);
+                String valor = id.lexemeRank(-1);
+                if(simbolos.size()<1){
+                    simbolos.add(new String[]{identificador,tipo_dato,valor,id.getLine()+""});
+                    continue;
+                }
+                //ERROR SEMANTICO 5: declaracion de variable repetida.
+                int c = 0;
+                for (var s:simbolos) {
+                    if (s[0].equals(identificador) ) {
+                        errores.add(new ErrorLSSL(5, "Error Semantico {} en la linea #, declaración de una variable previamente declarada", id, true));
+                        break;
+                    }
+                    c++;
+                }
+                if(c == simbolos.size()){
+                    simbolos.add(new String[]{identificador, tipo_dato, valor, id.getLine() + ""});
+                }
             }
         }
         
-        //Tipo de Dato no valido en la declaracion de un vector
+        //---------------Agregar las variables declaradas sin valor
+        for (Production id : idSValor) {
+            String tipoDato = id.lexemeRank(1);
+            String nombre = id.lexemeRank(2); //id,td,valor,declaracion,ref
+            if(simbolos.size()<1){
+                simbolos.add(new String[]{nombre,tipoDato,null,id.getLine()+""});
+                continue;
+            }
+            //ERROR SEMANTICO 5: declaracion de variable repetida.
+            int c = 0;
+            for (var s : simbolos) {
+                if (s[0].equals(nombre)) {
+                    errores.add(new ErrorLSSL(5, "Error Semantico {} en la linea #, declaración de una variable previamente declarada", id, true));
+                    break;
+                }
+                c++;
+            }
+            if (c == simbolos.size()) {
+                simbolos.add(new String[]{nombre, tipoDato, null, id.getLine() + ""});
+            }
+        }
+        
+        
+        //------------------Tipo de Dato no valido en la declaracion de un VECTOR-----------
         //VECT TD id OpAsig CorchA valores CorchC
         for(Production v:decVecVal){
-            
+            String id = v.lexemeRank(2);
             String td = v.lexemeRank(1);    // VECT0 TD1 ID2 =3 [4 val5];VECT0 TD1 id2 [3 N4 ]5
+            String vals = "";
+            //------------------VERIFICAR QUE LOS VALORES INGRGESADOS CORRESPONDEN CON EL TIPO
             int x = 5;
             while (!v.lexemeRank(x).equals("]")) {
-                if(!v.lexicalCompRank(x).equals("Coma")){
+                if(!v.lexemeRank(x).equals(",")){
                     if (!idTipoDato.get(td).equals(v.lexicalCompRank(x)) && !(v.lexemeRank(1).equals("ENT") || v.lexemeRank(1).equals("BOOL"))) {
                         errores.add(new ErrorLSSL(3, "Error Semantico {} en la linea #, no corresponde 1 o mas de los valores asignados al arreglo", v, true));
                         break;
@@ -1126,9 +1171,43 @@ public class Compilador extends javax.swing.JFrame {
                     } else if (v.lexemeRank(1).equals("BOOL") && !(v.lexicalCompRank(x).equals("Verdadero") || v.lexicalCompRank(x).equals("Falso"))) {
                         errores.add(new ErrorLSSL(3, "Error Semantico {} en la linea #, no corresponde 1 o mas de los valores asignados al arreglo", v, true));
                         break;
+                    }else{
+                       vals += v.lexemeRank(x)+",";
                     }
                 }
                 x++;
+            }
+            //-------VERIFICAR QUE NO SE HA USADO ESE NOMBRE ANTES
+            for(var s: simbolos){
+                if(s[0].equals(id)){
+                    errores.add(new ErrorLSSL(5, "Error Semantico {} en la linea #, la variable fue declarada previamente.", v, true));
+                    break;
+                }
+            }
+            //Ahora si a meterlos a la "tabla"
+            if(idVector.size()<1){
+                if(v.lexemeRank(4).equals("[")){
+                    idVector.add(new String[]{id,td,(x-5)+"",vals,v.getLine()+""});
+                }else{
+                    idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
+                }
+                continue;
+            }
+            //ver que no se repita dentro de los vectores
+            boolean repetido=true;
+            for(var idv:idVector){
+                if(idv[0].equals(id)){
+                    errores.add(new ErrorLSSL(5, "Error Semantico {} en la linea #, la variable fue declarada previamente.", v, true));
+                    repetido=false;
+                    break;
+                }
+            }
+            if(repetido){
+                if(v.lexemeRank(4).equals("[")){
+                    idVector.add(new String[]{id,td,(x-5)+"",vals,v.getLine()+""});
+                }else{
+                    idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
+                }
             }
             
         }
@@ -1138,24 +1217,22 @@ public class Compilador extends javax.swing.JFrame {
         for(var p: asign){ 
             String id = p.lexemeRank(0);
             String valAs = p.lexicalCompRank(2);
-            String td="";
+            String td = null;
             for(var s:simbolos){
-                if(s[0].equals(id) && s[1]==null){
-                    errores.add(new ErrorLSSL(55,"Error Semantico {} en la linea #, la variable no ha sido declarada",p,true  ));
-                    
-                }else if(s[0].equals(id)){
+                if(s[0].equals(id)){
                     td = s[1].trim();
-                    
+                    if (!idTipoDato.get(td).equals(valAs) && !(td.equals("BOOL") || td.equals("ENT"))) {
+                        errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
+                    } else if (td.equals("ENT") && !(valAs.equals("Numero_Entero") || valAs.equals("Numero_Mini"))) {
+                        errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
+                    } else if (td.equals("BOOL") && !(valAs.equals("Verdadero") || valAs.equals("Falso"))) {
+                        errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
+                    }
+                    break;
                 }
             }
-            if(!td.equals("")){
-                if (!idTipoDato.get(td).equals(valAs) && !(td.equals("BOOL") || td.equals("ENT"))) {
-                    errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
-                } else if (td.equals("ENT") && !(valAs.equals("Numero_Entero") || valAs.equals("Numero_Mini"))) {
-                    errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
-                } else if (td.equals("BOOL") && !(valAs.equals("Verdadero") || valAs.equals("Falso"))) {
-                    errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", p, true));
-                }
+            if(td ==null){
+                errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", p, true));
             }
         }
     
@@ -1262,88 +1339,9 @@ public class Compilador extends javax.swing.JFrame {
         }//caja
         
         
-        //ERROR SEMANTICO 5: declaracion de variable repetida.
-        ArrayList<Production> declaracion = identValor;
         
-        declaracion.addAll(idSValor);
-        
-        for(var a: declaracion){
-            
-            for(var s: declaracion.subList(declaracion.indexOf(a)+1, declaracion.size() )){
-                    if(a.lexemeRank(2).equals(s.lexemeRank(2)) ){
-                        
-                        errores.add(new ErrorLSSL(5,"Error Semantico {} en la linea #, declaración de una variable previamente declarada",a,true ));
-                        System.out.println("primer if"+a.lexemeRank(2));
-                        break;
-                    }
-                
-            }
-        }
-
-
      
     }//fin semantico
-
-    
-   // ****************************** ARRAYLIST DE IDENTIFICADORES  *********************
-    private void valoresIdent(ArrayList<Production> idVal) {
-
-        for (Production id : identValor) {
-            String tipo_dato = id.lexemeRank(1);
-            String identificador = id.lexemeRank(-3);
-            String valor = id.lexemeRank(-1);
-            for (var sim : simbolos) {                      //para el semantico
-                if (sim[0].equals(identificador)) {
-                    sim[1] = tipo_dato;
-                    sim[2] = valor;
-                    simbolos.set(simbolos.indexOf(sim), sim);
-                    break;
-                }
-            }
-        }
-        for (Production id : idVal) {
-            String tipoDato = id.lexemeRank(1);
-            String nombre = id.lexemeRank(2);
-            for (var sim : simbolos) {
-                if (sim[0].equals(nombre) && (sim[1]==null)) {
-                    sim[1] = tipoDato;
-                    simbolos.set(simbolos.indexOf(sim), sim);
-                    break;
-                }
-            }
-        }
-    }
-
-    
-
-    private void meterListass(ArrayList<Production> vect) {
-        for (Production l : vect) {
-            String nom = l.lexemeRank(2);
-            StringBuilder valBuilder = new StringBuilder(); // VECT0 TD1 ID2 =3 [4 val5];VECT0 TD1 id2 [3 N4 ]5
-            int x = 5;
-            while (!l.lexemeRank(x).equals("]")) {
-                valBuilder.append(l.lexemeRank(x)).append(" ");
-                x++;
-            }
-            String val = valBuilder.toString().trim();
-
-            for (var s : simbolos) {
-                if (s[0].equals(nom)) {
-                    // Separar val en diferentes columnas por comas
-                    String[] valores = val.split(",");
-                    String[] newRow = new String[2 + valores.length];
-                    newRow[0] = nom;
-                    newRow[1] = l.lexemeRank(1);
-                    for (int i = 0; i < valores.length; i++) {
-                        newRow[2 + i] = valores[i].trim();
-                    }
-                    idVector.add(newRow);
-                    simbolos.remove(s);
-                    break;
-                }
-            }
-        }
-    }
 
     private void cambioColor() {
         /* Limpiar el arreglo de colores */

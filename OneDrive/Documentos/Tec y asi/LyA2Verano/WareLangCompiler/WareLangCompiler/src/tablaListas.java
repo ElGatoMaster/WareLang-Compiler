@@ -34,7 +34,7 @@ public class tablaListas extends javax.swing.JDialog {
     
     public void llenarTabla(){
         
-        String columna[] = {"Identificador","Tipo de Dato","Valor", "Valor", "Valor", "Valor", "Valor", "Valor", "Valor", "Valor"};
+        String columna[] = {"Identificador","Tipo de Dato","Tamaño","Valores","Declaración"};
         tabla.setColumnIdentifiers(columna); 
 
         
