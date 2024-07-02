@@ -15,7 +15,7 @@ DEF metodoSP(){
    SI(REVISAR(#000000,12)==VERDADERO){
       buscados[cont] = 'producto1';
       encontrado = VERDADERO;
-      ALARMA(alarm);
+      ALARMA(var);
       avanzarConCuidado();
       cont+=1;
    }SINO{

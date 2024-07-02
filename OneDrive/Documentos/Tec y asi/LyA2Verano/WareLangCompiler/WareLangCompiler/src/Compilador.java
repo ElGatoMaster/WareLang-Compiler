@@ -409,27 +409,6 @@ public class Compilador extends javax.swing.JFrame {
                 if (token == null) {
                     break;
                 }
-//                if (token.getLexicalComp().equals("Identificador")) {
-//                    boolean repetido = false;
-//                    // Verificar si el lexema del token está repetido en los símbolos
-//                    for (String[] simbolo : simbolos) {
-//                        if (simbolo[0].equals(token.getLexeme())) {
-//                            simbolo[4] += token.getLine() + ",";
-//                            simbolos.set(simbolos.indexOf(simbolo), simbolo);
-//                            repetido = true;
-//                            break;
-//                        }yvan
-//                    }
-//                    // Si no está repetido, agregar el token a los símbolos
-//                    if (!repetido) {
-//                        //identificador,tipodeDato,lineaDeclaracion,lineas referenciadas
-//                        simbolos.add(new String[]{token.getLexeme(), null, null, token.getLine() + "", ""});
-//                    }
-//                }
-//
-//                if (token.getLexicalComp().equals("Palabra_Reservada_Met")) {
-//                    metodos.add(new String[]{token.getLexeme(), "", "", String.valueOf(token.getLine())});
-//                }
                 tokens.add(token);
             }
         } catch (FileNotFoundException ex) {
@@ -1115,15 +1094,16 @@ public class Compilador extends javax.swing.JFrame {
                     continue;
                 }
                 //ERROR SEMANTICO 5: declaracion de variable repetida.
-                int c = 0;
+                boolean c = true;
                 for (var s:simbolos) {
                     if (s[0].equals(identificador) ) {
                         errores.add(new ErrorLSSL(5, "Error Semantico {} en la linea #, declaración de una variable previamente declarada", id, true));
+                        c = false;
                         break;
                     }
-                    c++;
+                    
                 }
-                if(c == simbolos.size()){
+                if(c){
                     simbolos.add(new String[]{identificador, tipo_dato, valor, id.getLine() + ""});
                 }
             }
@@ -1160,6 +1140,7 @@ public class Compilador extends javax.swing.JFrame {
             String vals = "";
             //------------------VERIFICAR QUE LOS VALORES INGRGESADOS CORRESPONDEN CON EL TIPO
             int x = 5;
+            int tam = 0;
             while (!v.lexemeRank(x).equals("]")) {
                 if(!v.lexemeRank(x).equals(",")){
                     if (!idTipoDato.get(td).equals(v.lexicalCompRank(x)) && !(v.lexemeRank(1).equals("ENT") || v.lexemeRank(1).equals("BOOL"))) {
@@ -1173,6 +1154,7 @@ public class Compilador extends javax.swing.JFrame {
                         break;
                     }else{
                        vals += v.lexemeRank(x)+",";
+                       tam++;
                     }
                 }
                 x++;
@@ -1187,7 +1169,7 @@ public class Compilador extends javax.swing.JFrame {
             //Ahora si a meterlos a la "tabla"
             if(idVector.size()<1){
                 if(v.lexemeRank(4).equals("[")){
-                    idVector.add(new String[]{id,td,(x-5)+"",vals,v.getLine()+""});
+                    idVector.add(new String[]{id,td,tam+"",vals,v.getLine()+""});
                 }else{
                     idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
                 }
@@ -1199,12 +1181,12 @@ public class Compilador extends javax.swing.JFrame {
                 if(idv[0].equals(id)){
                     errores.add(new ErrorLSSL(5, "Error Semantico {} en la linea #, la variable fue declarada previamente.", v, true));
                     repetido=false;
-                    break;
+                    break; //Este solo rompe el ciclo que busca en los vectores
                 }
             }
             if(repetido){
                 if(v.lexemeRank(4).equals("[")){
-                    idVector.add(new String[]{id,td,(x-5)+"",vals,v.getLine()+""});
+                    idVector.add(new String[]{id,td,tam+"",vals,v.getLine()+""});
                 }else{
                     idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
                 }
@@ -1251,13 +1233,8 @@ public class Compilador extends javax.swing.JFrame {
             String td = "";
 
             if (Movimiento.lexicalCompRank(2).equals("Identificador")) {
-
                 for (var s : simbolos) {
-                    if (s[0].equals(id) && (s[1] == null)) {
-                        errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Movimiento, true));
-                        break;
-
-                    } else if(s[0].equals(id) && !(s[1] == null)){
+                    if(s[0].equals(id) && !(s[1] == null)){
                         td = s[1].trim();
                         if (!(td.equals("MINI") || td.equals("ENT"))) {
                             errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
@@ -1266,7 +1243,11 @@ public class Compilador extends javax.swing.JFrame {
                         }
                     }
                 }//for simbolos
-
+                //Nueva validacion de que este declarado
+                if(td.equals("")){
+                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Movimiento, true));
+                }
+                
             } else if (!Movimiento.lexicalCompRank(2).equals("Numero_Entero")
                     && !Movimiento.lexicalCompRank(2).equals("Numero_Mini")) {
                 errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Movimiento, true));
@@ -1287,11 +1268,7 @@ public class Compilador extends javax.swing.JFrame {
             if (Alarma.lexicalCompRank(2).equals("Identificador")) {
 
                 for (var s : simbolos) {
-                    if (s[0].equals(id) && (s[1] == null)) {
-                        errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Alarma, true));
-                        break;
-
-                    } else if(s[0].equals(id) && !(s[1] == null)){
+                    if(s[0].equals(id) && !(s[1] == null)){
                         td = s[1].trim();
                         if (!(td.equals("FREC"))) {
                             errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
@@ -1300,11 +1277,13 @@ public class Compilador extends javax.swing.JFrame {
                         }
                     }
                 }//for simbolos
-
+                //Nueva validacion de declaracion
+                if(td.equals("")){
+                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Alarma, true));
+                }
             } else if (!Alarma.lexicalCompRank(2).equals("Numero_Entero")
                     && !Alarma.lexicalCompRank(2).equals("Numero_Mini")) {
                     errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Alarma, true));
-
             }
         }//alarma
         
@@ -1318,11 +1297,7 @@ public class Compilador extends javax.swing.JFrame {
             if (Caja.lexicalCompRank(2).equals("Identificador")) {
 
                 for (var s : simbolos) {
-                    if (s[0].equals(id) && (s[1] == null)) {
-                        errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Caja, true));
-                        break;
-
-                    } else if(s[0].equals(id) && !(s[1] == null)){
+                    if(s[0].equals(id) && !(s[1] == null)){
                         td = s[1].trim();
                         if (!(td.equals("DEC"))) {
                             errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
@@ -1331,6 +1306,11 @@ public class Compilador extends javax.swing.JFrame {
                         }
                     }
                 }//for simbolos
+                //Nueva Manera de comprobar que existe la variable
+                if(td.equals("")){
+                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Caja, true));
+                    break;
+                }
 
             } else if (!Caja.lexicalCompRank(2).equals("Numero_Decimal")) {
                     errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Caja, true));
