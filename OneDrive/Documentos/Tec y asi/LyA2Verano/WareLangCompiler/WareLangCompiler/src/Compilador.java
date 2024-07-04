@@ -55,7 +55,7 @@ public class Compilador extends javax.swing.JFrame {
     private tablaTokens tablaT;
 
     private ArrayList<String[]> simbolos;
-    private ArrayList<String[]> metodos;
+    private ArrayList<String[]> metodosDeclarados;
     private ArrayList<String[]> idVector;
     private ArrayList<String[]> lisTokens;
 
@@ -67,6 +67,10 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> decVecVal;
     private ArrayList<Production> FuncionAlarma;
     private ArrayList<Production> FuncionCaja;
+    private ArrayList<Production> FuncionRevisar;
+    private ArrayList<Production> FuncionImprimir;
+    private ArrayList<Production> DefinirMetodos;
+    
     private ArrayList<Production> asignVec;
     private ArrayList<Production> expRel;
    
@@ -118,7 +122,7 @@ public class Compilador extends javax.swing.JFrame {
         tokens = new ArrayList<>();
         lisTokens = new ArrayList<>();
         simbolos = new ArrayList<>();
-        metodos = new ArrayList<>();
+        metodosDeclarados = new ArrayList<>();
         idVector = new ArrayList<>();
 
         //modificacion para hacer el semantico
@@ -128,6 +132,9 @@ public class Compilador extends javax.swing.JFrame {
         idSValor = new ArrayList<>();
         FuncionAlarma = new ArrayList<>();
         FuncionCaja = new ArrayList<>();
+        FuncionRevisar = new ArrayList<>();
+        FuncionImprimir = new ArrayList<>();
+        DefinirMetodos = new ArrayList<>();
         expRel = new ArrayList<>();
 
         decVecVal = new ArrayList<>();
@@ -425,7 +432,6 @@ public class Compilador extends javax.swing.JFrame {
     private void analisisSintactico() {
         Grammar gramatica = new Grammar(tokens, errores);
         
-        ArrayList<Production> mets = new ArrayList<>();
         
         
 
@@ -594,7 +600,7 @@ public class Compilador extends javax.swing.JFrame {
   
         
         // **********************  DECLARACION DE METODOS **********************************
-        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Par_abr Par_cer",mets);
+        gramatica.group("DeclaracionMetodo", "DEF (Identificador|Expresion) Par_abr Par_cer",DefinirMetodos);
         
         gramatica.group("DeclaracionMetodoError", "(Identificador|Expresion) Par_abr Par_cer Llav_abr");
         
@@ -728,7 +734,7 @@ public class Compilador extends javax.swing.JFrame {
        
 
         //********************************** EST REVISAR **************************
-        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador) Coma (Identificador | Numero) Par_cer");
+        gramatica.group("EstRevisar", "F_REVISAR Par_abr (Valor|Identificador|Numero) Coma (Valor |Identificador | Numero) Par_cer", FuncionRevisar);
         
                  
         gramatica.group("EstRevisar", "F_REVISAR Par_abr  Par_cer",20,
@@ -772,7 +778,7 @@ public class Compilador extends javax.swing.JFrame {
         
        
     //**********************************METODOS IMPRM  ***********************
-        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor|metListaSacar) Coma OpImpr Par_cer");
+        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor | Numero | Identificador) Coma (Valor| Numero | Identificador) Par_cer", FuncionImprimir);
         
         gramatica.group("EstImpr", "F_IMPR ",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
@@ -1323,6 +1329,80 @@ public class Compilador extends javax.swing.JFrame {
             }
         }//caja
         
+        
+          //******************** MÉTODO REVISAR *******************
+          for (Production Revisar: FuncionRevisar) {
+            String id = Revisar.lexemeRank(2);
+            String td = "";
+
+            if (Revisar.lexicalCompRank(2).equals("Identificador")) {
+                for (var s : simbolos) {
+                     if(s[0].equals(id) && !(s[1] == null)){
+                        td = s[1].trim();
+                        if (!td.equals("COLOR")) {
+                            errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
+                                    + "parámetro esperado por el método", Revisar, true));
+                            break;
+                        }
+                    }    
+      
+                }//for simbolos
+                                     
+             if(td.equals("")){
+                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Revisar, true));
+                    break;
+                }   
+
+            }else  if (!Revisar.lexicalCompRank(2).equals("Hexadecimal")) {
+                errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Revisar, true));
+
+            }
+            if (!Revisar.lexicalCompRank(4).equals("Numero_Entero")
+                    && !Revisar.lexicalCompRank(4).equals("Numero_Mini")) {
+                    errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Revisar, true));
+            }
+          
+          }//Revisar   
+          
+          
+           //******************** MÉTODO IMPRIMIR *******************
+        
+       ArrayList<String> ImprimirOP = new ArrayList<>();
+        ImprimirOP.add("LCD");
+        ImprimirOP.add("CONSOL");
+    
+        for (Production Imprimir: FuncionImprimir) {
+            String id = Imprimir.lexemeRank(2);
+            String td = "";
+
+            if (Imprimir.lexicalCompRank(2).equals("Identificador")) {
+
+                for (var s : simbolos) {
+                    if(s[0].equals(id) && !(s[1] == null)){
+                        td = s[1].trim();
+                        if (!td.equals("CAD")) {
+                            errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el "
+                                    + "parámetro esperado por el método", Imprimir, true));
+                            break;
+                        }
+                    }
+                }//for simbolos
+           
+              if(td.equals("")){
+                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", Imprimir, true));
+                    break;
+               }      
+                
+            } else if (!Imprimir.lexicalCompRank(2).equals("Cadena")) {
+                errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", Imprimir, true));
+
+            }
+            if (!ImprimirOP.contains(Imprimir.lexemeRank(4))) {
+                errores.add(new ErrorLSSL(57, "Error Semantico {} en la linea #, '" + Imprimir.lexemeRank(4) + "' debe contener el dispotivo de impresion( LCD o CONSOL)", Imprimir, true));
+            }
+
+        }//Imprimir
+        
         //-----------ERRORES en la ASIGNACION DE VECTORES
         for(var av: asignVec){
             String id = av.lexemeRank(0);
@@ -1530,6 +1610,34 @@ public class Compilador extends javax.swing.JFrame {
             }//Primer switch
                         
         }//Errores en expresion logica
+        
+        
+        
+         // -------------------------- ERROR SEMANTICO PARA NOMBRES DE METODOS REPETIDOS
+        for(Production Metodos: DefinirMetodos){ 
+
+                String NombreMetodo = Metodos.lexemeRank(1); 
+                
+                if(metodosDeclarados.size()<1){
+                    metodosDeclarados.add(new String[]{NombreMetodo});
+                    continue;
+                }
+                
+                boolean c = true;
+                for (var Met:metodosDeclarados) {
+                    if (Met[0].equals(NombreMetodo) ) {
+                        errores.add(new ErrorLSSL(61, "Error Semantico {} en la linea #, el nombre de este método ya existe.", Metodos, true));
+                        c = false;
+                        break;
+                    }
+                    
+                }
+                if(c){
+                    metodosDeclarados.add(new String[]{NombreMetodo});
+                }
+            } //error nombres metodos repetidos
+        
+        
      
     }//FIN SEMANTICO
 
@@ -1638,11 +1746,14 @@ public class Compilador extends javax.swing.JFrame {
         errores.clear();
         idVector.clear();
         simbolos.clear();
-        metodos.clear();
+        metodosDeclarados.clear();
         lisTokens.clear();
         estadoCompilacion = false;
         
         FuncionesMovimiento.clear();
+        FuncionRevisar.clear();
+        FuncionImprimir.clear();
+        DefinirMetodos.clear();
         identValor.clear();
         FuncionAlarma.clear();
         FuncionCaja.clear();
