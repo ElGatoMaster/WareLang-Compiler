@@ -67,6 +67,8 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> decVecVal;
     private ArrayList<Production> FuncionAlarma;
     private ArrayList<Production> FuncionCaja;
+    private ArrayList<Production> asignVec;
+    private ArrayList<Production> expRel;
    
 
     /**
@@ -126,8 +128,10 @@ public class Compilador extends javax.swing.JFrame {
         idSValor = new ArrayList<>();
         FuncionAlarma = new ArrayList<>();
         FuncionCaja = new ArrayList<>();
+        expRel = new ArrayList<>();
 
         decVecVal = new ArrayList<>();
+        asignVec = new ArrayList<>();
         
         
         errores = new ArrayList();
@@ -870,7 +874,7 @@ public class Compilador extends javax.swing.JFrame {
        gramatica.group("Asignacion", "(Expresion|Identificador) Op_Adisi (Expresion|Identificador|Numero) ",56,
                     "Error sintáctico (56): En la línea #, Operador invalido para esta operación");
        
-       gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr (Identificador|Numero)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor)");
+       gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr (Identificador|Numero|Valor)Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor)",asignVec);
        
         gramatica.group("Asignacion", "(Identificador) Corch_abr (Identificador|Numero)Corch_cer Op_Adisi"
                 + "(Expresion|Identificador|Numero|Valor)",56,
@@ -882,8 +886,8 @@ public class Compilador extends javax.swing.JFrame {
         //***************************** EXPRESIONES REL Y LOGICAS *********************************
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.group("ExpresionDos","LlamadaCond");
-            gramatica.group("Expresion", "Par_abr ExpAritF Par_cer |ExpAritF | Valor | Numero | Identificador");
-            gramatica.group("ExpRel", "(Expresion |ExpresionDos) OpRel (Expresion |ExpresionDos)");
+            gramatica.group("Expresion", "Valor | Numero | Identificador");
+            gramatica.group("ExpRel", "(Expresion |ExpresionDos) OpRel (Expresion |ExpresionDos)",expRel);
             gramatica.group("ExpRel", "(Expresion |ExpresionDos) (Op_Adisi|Op_Asign|Op_asignacion)"
                     + "(Expresion |ExpresionDos)",56,
                     "Error sintáctico (56): En la línea #, Operador invalido para esta operación");
@@ -893,6 +897,9 @@ public class Compilador extends javax.swing.JFrame {
 
        
        // ******************************* Errores de asignacion ******************************
+       
+       gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) ",52,
+               "Error sintáctico (52): En la línea #, Falta el indice del arreglo");
        
        gramatica.group("Asignacion", "(ERROR_1 |ERROR_7)* Op_Asign (Expresion|Identificador|Numero) ",53,
                 "Error sintáctico (53): En la línea #, Sentencia incompleta");
@@ -920,8 +927,7 @@ public class Compilador extends javax.swing.JFrame {
        gramatica.group("Asignacion", "(Expresion|Identificador)  (Expresion|Identificador|Numero)(Corch_cer) Op_asignacion (Expresion|Identificador|Numero|Valor)",51,
                "Error sintáctico (51): En la línea #, Falta abrir o cerrar corchetes");
        
-       gramatica.group("Asignacion", "(Expresion|Identificador) Corch_abr Corch_cer Op_asignacion (Expresion|Identificador|Numero|Valor) ",52,
-               "Error sintáctico (52): En la línea #, Falta el indice del arreglo");
+       
        
        
        gramatica.finalLineColumn();
@@ -1071,7 +1077,7 @@ public class Compilador extends javax.swing.JFrame {
         idTipoDato.put("DEC", "Numero_Decimal");
         idTipoDato.put("FREC", "Numero_Entero");
         idTipoDato.put("COLOR", "Hexadecimal");
-        idTipoDato.put("BOOL", "VERDADERO | FALSO");
+        idTipoDato.put("BOOL", "Verdadero Falso");
         
     // -------------------------- ERROR SEMANTICO: Validar el tipo de dato y el dato asignado ------------------------
         for(var id: identValor){ 
@@ -1289,7 +1295,6 @@ public class Compilador extends javax.swing.JFrame {
         
         
         //******************** MÉTODO CAJA *******************
-        
         for (Production Caja: FuncionCaja) {
             String id = Caja.lexemeRank(2);
             String td = "";
@@ -1318,10 +1323,215 @@ public class Compilador extends javax.swing.JFrame {
             }
         }//caja
         
+        //-----------ERRORES en la ASIGNACION DE VECTORES
+        for(var av: asignVec){
+            String id = av.lexemeRank(0);
+            String td = "";
+            String vAs = av.lexicalCompRank(5); 
+            int tam = 0;
+            for(var v: idVector){
+                if(v[0].equals(id)){
+                    td = v[1];//obtiene el tipo de dato del vector
+                    tam = Integer.parseInt(v[2]);//obtiene el tamaño del vector
+                    break;
+                }
+            }
+            //Validar que el vector ha sido declarado
+            if(td.equals("")){
+                errores.add(new ErrorLSSL(57, "Error Semantico {} en la linea #, el vector '"+id+"' no ha sido declarado", av, true));
+                break;
+            }
+            //Validar que el dato asignado corresponde al tipo del vector
+            if (!idTipoDato.get(td).equals(vAs) && !(td.equals("BOOL") || td.equals("ENT"))) {
+                errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", av, true));
+            } else if (td.equals("ENT") && !(vAs.equals("Numero_Entero") || vAs.equals("Numero_Mini"))) {
+                errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", av, true));
+            } else if (td.equals("BOOL") && !(vAs.equals("Verdadero") || vAs.equals("Falso"))) {
+                errores.add(new ErrorLSSL(54, "Error Semantico {} en la linea #, no corresponde el valor asignado con el tipo de dato", av, true));
+            }
+            //Verificar que si se esta usando una variable como indice, el tipo de dato sea correcto
+            if(av.lexicalCompRank(2).equals("Identificador")){
+                td = "";
+                for(var s:simbolos){
+                    if(s[0].equals(av.lexemeRank(2))){
+                        td = s[1];
+                        if(!td.equals("ENT") && !td.equals("MINI")){
+                            errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, se esperaba un valor entero como indice del vector.", av, true));
+                            System.out.println("tipo de dato incorrecto en la variable");
+                            break;
+                        }
+                    }
+                }
+                if(td.equals("")){
+                    errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, la variable usada como indice no ha sido declarada", av, true));
+                    continue;
+                }
+                continue;
+                //Aqui hace falta validar el valor de la variable
+            }
+            //Verificar que el valor dentro de los corchetes es un numero entero
+            if(!av.lexicalCompRank(2).equals("Numero_Entero") && !av.lexicalCompRank(2).equals("Numero_Mini")){
+                errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, se esperaba un valor entero como indice del vector.", av, true));
+                System.out.println("tipo de dato ingresado no valido");
+                continue;
+            }
+            //Verificar que el valor esta dentro del rango del vector
+            int temp = Integer.parseInt(av.lexemeRank(2));
+            if(temp<0 || temp >= tam){
+                errores.add(new ErrorLSSL(57, "Error Semantico {} en la linea #, indice fuera del rango del vector.", av, true));
+            }
+        }
         
-        
+        //++++++++++++++++ERROR DE TIPOS EN EXPRESION LOGICA
+        for(var exp: expRel){
+            System.out.println(exp.lexicalCompRank(0));
+            switch (exp.lexicalCompRank(0)) {
+                case "F_REVISAR", "VerAdelante", "VerAtras", "VerDerecha", "VerIzquierda" -> {
+                    //Verificar si el primer termino es un método, entonces el segundo debe ser booleano
+                    if(!exp.lexicalCompRank(-1).equals("Verdadero") && !exp.lexicalCompRank(-1).equals("Falso")){
+                        errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                        break;
+                    }
+                }
+                
+                case "Identificador" ->{
+                    String id1 = exp.lexemeRank(0);
+                    String td1 = "";
+                    //Comprobar todo lo relacionado a la primer variable
+                    for(var s:simbolos){
+                        if(s[0].equals(id1)){
+                            td1 = s[1]; //obtener tipo de dato del primer operador
+                            break;
+                        }
+                    }
+                    if(td1.equals("")){
+                        errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", exp, true));
+                        break;
+                    }
+                    //Ahora a ver q pedo con el otro operador
+                    if(exp.lexicalCompRank(-1).equals("Identificador")){
+                        String id2 = exp.lexemeRank(-1);
+                        String td2 = "";
+                        for (var s : simbolos) {
+                            if (s[0].equals(id2)) {
+                                td2 = s[1]; //obtener tipo de dato del primer operador
+                                break;
+                            }
+                        }
+                        if (td2.equals("")) {
+                            errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", exp, true));
+                            break;
+                        }
+                        //si ambas son variables declaradas comparar los tipos
+                        if (((td1.equals("ENT") || td1.equals("MINI")) && (!td2.equals("ENT") && !td2.equals("MINI")))) {
+                            errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                            break;
+                        } else if (!td1.equals(td2)) {
+                            errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                            break;
+                        }
+                    }else {
+                        if (!idTipoDato.get(td1).equals(exp.lexicalCompRank(-1)) && !(td1.equals("ENT") || td1.equals("BOOL"))) {
+                            errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                            System.out.println("1");
+                            break;
+                        } else if (td1.equals("ENT") && !(exp.lexicalCompRank(-1).equals("Numero_Entero") || exp.lexicalCompRank(-1).equals("Numero_Mini"))) {
+                            errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                            System.out.println("2");
+                            break;
+                        } else if (td1.equals("BOOL") && !(exp.lexicalCompRank(-1).equals("Verdadero") || exp.lexicalCompRank(-1).equals("Falso"))) {
+                            errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                            System.out.println("3");
+                            break;
+                        }
+                    }//FIN IF-ELSE
+                
+                }//CASO IDENTIFICADOR
+                
+                default -> { //Verificar ahora desde el lado DERECHO
+                    switch (exp.lexicalCompRank(-1)) {
+                        case "F_REVISAR", "VerAdelante", "VerAtras", "VerDerecha", "VerIzquierda","Par_cer" -> {
+                            //Verificar si el primer termino es un método, entonces el segundo debe ser booleano
+                            if (!exp.lexicalCompRank(0).equals("Verdadero") && !exp.lexicalCompRank(0).equals("Falso")) {
+                                errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                break;
+                            }
+                        }
+                        case "Identificador" -> {
+                            String id1 = exp.lexemeRank(-1);
+                            String td1 = "";
+                            //Comprobar todo lo relacionado a la primer variable
+                            for (var s : simbolos) {
+                                if (s[0].equals(id1)) {
+                                    td1 = s[1]; //obtener tipo de dato del primer operador
+                                    break;
+                                }
+                            }
+                            if (td1.equals("")) {
+                                errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", exp, true));
+                                break;
+                            }
+                            //Ahora a ver q pedo con el otro operador
+                            if (exp.lexicalCompRank(0).equals("Identificador")) {
+                                String id2 = exp.lexemeRank(0);
+                                String td2 = "";
+                                for (var s : simbolos) {
+                                    if (s[0].equals(id2)) {
+                                        td2 = s[1]; //obtener tipo de dato del primer operador
+                                        break;
+                                    }
+                                }
+                                if (td2.equals("")) {
+                                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", exp, true));
+                                    break;
+                                }
+                                //si ambas son variables declaradas comparar los tipos
+                                if (((td1.equals("ENT") || td1.equals("MINI")) && (!td2.equals("ENT") && !td2.equals("MINI"))) ) {
+                                    errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                    break;
+                                }else if(!td1.equals(td2)){
+                                    errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                    break;
+                                }
+                            } else {
+                                if (!idTipoDato.get(td1).equals(exp.lexicalCompRank(0)) && !(td1.equals("ENT") || td1.equals("BOOL"))) {
+                                    errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                    
+                                    break;
+                                } else if (td1.equals("ENT") && !(exp.lexicalCompRank(0).equals("Numero_Entero") || exp.lexicalCompRank(0).equals("Numero_Mini"))) {
+                                    errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                    
+                                    break;
+                                } else if (td1.equals("BOOL") && !(exp.lexicalCompRank(0).equals("Verdadero") || exp.lexicalCompRank(0).equals("Falso"))) {
+                                    errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                    
+                                    break;
+                                }
+                            }//FIN IF-ELSE
+
+                        }//CASO IDENTIFICADOR
+
+                        default -> {
+                            String op1 = exp.lexicalCompRank(0);
+                            String op2 = exp.lexicalCompRank(-1);
+                            if((op1.equals("Numero_Entero") || op1.equals("Numero_Mini")) && (!op2.equals("Numero_Entero") && !op2.equals("Numero_Mini")) ){
+                                errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                break;
+                            }else if((op1.equals("Verdadero") || op1.equals("Falso")) && (!op2.equals("Verdadero") && !op2.equals("Falso")) ){
+                                errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                break;
+                            }else if(!op1.equals(op2)){
+                                errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
+                                break;
+                            }
+                        }//default
+                    }//Segundo Switch o switch interno
+                }//Primer default
+            }//Primer switch
+                        
+        }//Errores en expresion logica
      
-    }//fin semantico
+    }//FIN SEMANTICO
 
     private void cambioColor() {
         /* Limpiar el arreglo de colores */
@@ -1439,6 +1649,8 @@ public class Compilador extends javax.swing.JFrame {
         asign.clear();
         decVecVal.clear();
         idSValor.clear();
+        asignVec.clear();
+        expRel.clear(); 
     }
 
     private void appendToPane(JTextPane tp, String msg, Color c) {

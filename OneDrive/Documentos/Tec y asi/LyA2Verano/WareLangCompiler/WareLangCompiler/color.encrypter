@@ -7,7 +7,6 @@ VECT CAD buscados[5];
 VECT ENT vector2 = [1,2,5,7];
 CONF BOOL encontrado ;
 CONF MINI cont = 0;
-CONF CAD x;
 
 
 //DECLARACION METODOS
@@ -15,13 +14,13 @@ DEF metodoSP(){
    SI(REVISAR(#000000,12)==VERDADERO){
       buscados[cont] = 'producto1';
       encontrado = VERDADERO;
-      ALARMA(var);
+      ALARMA(alarm);
       avanzarConCuidado();
       cont+=1;
    }SINO{
       avanzarConCuidado();
       encontrado = FALSO;
-      var = '';
+     // var = '';
    }
 }
 
@@ -47,7 +46,7 @@ DEF avanzarConCuidado(){
 //EJECUCION PRINCIPAL
 DEF principal(){
    alarm = 20;
-   MIENTRAS(y<5){
+   MIENTRAS(5<y){
       MIENTRAS(x<5){
          metodoSP();
       }
