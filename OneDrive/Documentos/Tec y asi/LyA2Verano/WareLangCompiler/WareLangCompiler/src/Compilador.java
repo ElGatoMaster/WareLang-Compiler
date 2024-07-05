@@ -70,6 +70,7 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> FuncionRevisar;
     private ArrayList<Production> FuncionImprimir;
     private ArrayList<Production> DefinirMetodos;
+    private ArrayList<Production> funcRepetir;
     
     private ArrayList<Production> asignVec;
     private ArrayList<Production> expRel;
@@ -140,6 +141,7 @@ public class Compilador extends javax.swing.JFrame {
         decVecVal = new ArrayList<>();
         asignVec = new ArrayList<>();
         
+        funcRepetir = new ArrayList<>();
         
         errores = new ArrayList();
         textocolor = new ArrayList<>();
@@ -982,7 +984,7 @@ public class Compilador extends javax.swing.JFrame {
         
         
         //******************************  ESTRUCTUTA REPETIR   *********************************
-        gramatica.group("EstRepetir", "Est_REPETIR Par_abr (Numero | Identificador | metListaRet) Par_cer ");
+        gramatica.group("EstRepetir", "Est_REPETIR Par_abr (Numero | Identificador | metListaRet) Par_cer ",funcRepetir);
         // ERRORES REPETIR
         gramatica.group("EstRepetir", "Est_REPETIR Par_abr  Par_cer ",19,
                 "Error sintáctico (23): En la línea #, Falta un valor."); 
@@ -1801,6 +1803,40 @@ public class Compilador extends javax.swing.JFrame {
             } //error nombres metodos repetidos
         
         
+        
+        //------------------- ERROR SEMÁNTICO 3: La condición de repitr no es número entero ---------
+        for(Production r: funcRepetir){
+            String id = r.lexemeRank(2);
+            String tipoDato = "";
+      
+        if(r.lexicalCompRank(2).equals("Identificador")){
+            for (var s : simbolos) {
+                if (s[0].equals(id) && (s[1] == null)) {
+                     errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", r, true));
+                     break;
+
+                } else if(s[0].equals(id) && !(s[1] == null)){
+                     tipoDato = s[1].trim();
+                        if (!tipoDato.equals("ENT") && !tipoDato.equals("MINI")) {
+                            errores.add(new ErrorLSSL(3, "Error Semantico {} en la linea #, La condición de repitr no es número entero", r, true));
+                            break;
+                        }
+                       
+                 }
+            }//for simbolos
+            
+            if(tipoDato.equals("")){
+                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", r, true));
+                    break;
+                }   
+                
+        }else if(!r.lexicalCompRank(2).equals("Numero_Entero") && !r.lexicalCompRank(2).equals("Numero_Mini")){
+                errores.add(new ErrorLSSL(3,"Error Semantico {} en la linea #, La condición de repitr no es número entero",r,true));
+                
+              } 
+        }//for repetir
+        
+        
      
     }//FIN SEMANTICO
 
@@ -1925,6 +1961,7 @@ public class Compilador extends javax.swing.JFrame {
         idSValor.clear();
         asignVec.clear();
         expRel.clear(); 
+        funcRepetir.clear();
     }
 
     private void appendToPane(JTextPane tp, String msg, Color c) {

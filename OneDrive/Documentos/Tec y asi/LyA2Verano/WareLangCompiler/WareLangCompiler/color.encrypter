@@ -1,11 +1,13 @@
 CLASE busqueda{
 //DECLARACION DE VARIABLES
-CONF ENT x=0;
+CONF ENT x=20;
 CONF ENT y=0;
+CONF DEC z=1.1;
 CONF FREC alarm;
 VECT CAD buscados[5];
 CONF BOOL encontrado;
 CONF MINI cont = 0;
+
 
 //DECLARACION METODOS
 DEF metodoSP(){
@@ -19,7 +21,14 @@ DEF metodoSP(){
       avanzarConCuidado();
       encontrado = FALSO;
    }
+
+REPETIR(a){
+
 }
+
+}
+
+
 
 DEF avanzarConCuidado(){
    SI(VERADELANTE()==VERDADERO){
