@@ -2,41 +2,45 @@ CLASE busqueda{
 //DECLARACION DE VARIABLES
 CONF ENT x=0;
 CONF ENT y=0;
+CONF DEC z=1.1;
 CONF FREC alarm;
 VECT CAD buscados[5];
-CONF BOOL encontrado = 5;
+VECT ENT vector2 = [1,2,5,7];
+CONF BOOL encontrado ;
 CONF MINI cont = 0;
-CONF MINI cont;
+
+
 
 //DECLARACION METODOS
 DEF metodoSP(){
+	h = 1;
    SI(REVISAR(#000000,12)==VERDADERO){
       buscados[cont] = 'producto1';
-      encontrado = 7.1;
-      ALARMA(cont);
+      encontrado = VERDADERO;
+      ALARMA(alarm);
       avanzarConCuidado();
       cont+=1;
    }SINO{
       avanzarConCuidado();
       encontrado = FALSO;
-      variable = 5;
-      x = 'arrancate richard';
+     // var = '';
    }
 }
 
-DEF metodoSP(){
-   cadena = 'prueba';
+DEF metodoS(){
+   //cadena = 'prueba';
 }
 
 DEF avanzarConCuidado(){
    SI(VERADELANTE()==VERDADERO){
-      ADELANTE(alarm,1);
+      ADELANTE(1,2);
       x+=1;
    }SINO{
       PARAR();
       SI(VERDERECHA()==VERDADERO){
-         DERECHA(2.3,9);
-         x=0;y+=1;
+         DERECHA(1,1);
+         x=0;
+         y+=1;
       }
    }
 }
@@ -45,8 +49,8 @@ DEF avanzarConCuidado(){
 //EJECUCION PRINCIPAL
 DEF principal(){
    alarm = 20;
-   MIENTRAS(y<''){
-      MIENTRAS(x<5.1){
+   MIENTRAS(5<y){
+      MIENTRAS(x<5){
          metodoSP();
       }
    }

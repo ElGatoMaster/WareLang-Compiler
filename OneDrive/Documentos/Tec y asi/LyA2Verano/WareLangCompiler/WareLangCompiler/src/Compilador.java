@@ -635,7 +635,7 @@ public class Compilador extends javax.swing.JFrame {
         //***************************************** VECTORES *******************************
         
         
-        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr Numero Corch_cer ",decVecVal);
+        gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr (Numero|Valor) Corch_cer ",decVecVal);
        
         gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Op_asignacion Corch_abr"
                 + " ((Valor | Numero) | (Valor | Numero) Coma)+ Corch_cer ", decVecVal);
@@ -1345,7 +1345,12 @@ public class Compilador extends javax.swing.JFrame {
                 if(v.lexemeRank(4).equals("[")){
                     idVector.add(new String[]{id,td,tam+"",vals,v.getLine()+""});
                 }else{
-                    idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
+                    if(!v.lexicalCompRank(4).equals("Numero_Entero") && !v.lexicalCompRank(4).equals("Numero_Mini")){
+                        errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, se esperaba un valor entero como tamaño del vector.", v, true));
+                        
+                    }else{
+                        idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
+                    }
                 }
                 continue;
             }
@@ -1362,7 +1367,11 @@ public class Compilador extends javax.swing.JFrame {
                 if(v.lexemeRank(4).equals("[")){
                     idVector.add(new String[]{id,td,tam+"",vals,v.getLine()+""});
                 }else{
-                    idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
+                    if(!v.lexicalCompRank(4).equals("Numero_Entero") || !v.lexicalCompRank(4).equals("Numero_Mini")){
+                        errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, se esperaba un valor entero como tamaño del vector.", v, true));
+                    }else{
+                        idVector.add(new String[]{id,td,v.lexemeRank(4),vals,v.getLine()+""});
+                    }
                 }
             }
             
