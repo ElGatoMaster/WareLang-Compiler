@@ -1,6 +1,7 @@
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import compilerTools.CodeBlock;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import compilerTools.Directory;
@@ -26,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java_cup.production;
+import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
@@ -183,6 +185,7 @@ public class Compilador extends javax.swing.JFrame {
         btnGuardar = new javax.swing.JButton();
         btnGuardarC = new javax.swing.JButton();
         btnCompilar = new javax.swing.JButton();
+        btnCodInt = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -230,21 +233,20 @@ public class Compilador extends javax.swing.JFrame {
             .addGroup(panelButtonCompilerExecuteLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton2)
-                .addContainerGap())
+                .addGap(18, 18, 18))
         );
         panelButtonCompilerExecuteLayout.setVerticalGroup(
             panelButtonCompilerExecuteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelButtonCompilerExecuteLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(panelButtonCompilerExecuteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1)
                     .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGap(0, 2, Short.MAX_VALUE))
         );
 
         consola.setBackground(new java.awt.Color(204, 204, 204));
@@ -392,6 +394,13 @@ public class Compilador extends javax.swing.JFrame {
             }
         });
 
+        btnCodInt.setText("CI");
+        btnCodInt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCodIntActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -401,24 +410,27 @@ public class Compilador extends javax.swing.JFrame {
                 .addComponent(btnNuevo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAbrir, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnGuardar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnGuardarC, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnGuardarC)
-                .addGap(37, 37, 37)
                 .addComponent(btnCompilar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNuevo)
                     .addComponent(btnAbrir)
                     .addComponent(btnGuardar)
                     .addComponent(btnGuardarC)
-                    .addComponent(btnCompilar)))
+                    .addComponent(btnCompilar)
+                    .addComponent(btnCodInt))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel4.setBackground(new java.awt.Color(51, 51, 51));
@@ -485,8 +497,8 @@ public class Compilador extends javax.swing.JFrame {
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelButtonCompilerExecute, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelButtonCompilerExecute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -544,6 +556,20 @@ public class Compilador extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
        tabla.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void btnCodIntActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCodIntActionPerformed
+        //Se genera el codigo intermedio aqui en caliente.
+        if(estadoCompilacion && errores.isEmpty()){
+            //Pasos para el codigo intermedio
+            //CodeBlock codigoFuente = 
+            ArrayList<String> codigoDividido = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";").getBlocksOfCodeInOrderOfExec();
+            //System.out.println(codigoDividido);
+            generarCodigoIntermedio(codigoDividido,1);
+        }else{
+            JOptionPane.showMessageDialog(null, "No se puede generar el codigo intermedio porque el programa contiene errores...",
+                    "Error en la generacion de codigo", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnCodIntActionPerformed
 
     private void compile() {
         limpiarAreaCodigo();
@@ -1608,7 +1634,7 @@ public class Compilador extends javax.swing.JFrame {
                         td = s[1];
                         if(!td.equals("ENT") && !td.equals("MINI")){
                             errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, se esperaba un valor entero como indice del vector.", av, true));
-                            System.out.println("tipo de dato incorrecto en la variable");
+                            
                             break;
                         }
                     }
@@ -1623,7 +1649,7 @@ public class Compilador extends javax.swing.JFrame {
             //Verificar que el valor dentro de los corchetes es un numero entero
             if(!av.lexicalCompRank(2).equals("Numero_Entero") && !av.lexicalCompRank(2).equals("Numero_Mini")){
                 errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, se esperaba un valor entero como indice del vector.", av, true));
-                System.out.println("tipo de dato ingresado no valido");
+                
                 continue;
             }
             //Verificar que el valor esta dentro del rango del vector
@@ -1635,7 +1661,7 @@ public class Compilador extends javax.swing.JFrame {
         
         //++++++++++++++++ERROR DE TIPOS EN EXPRESION LOGICA
         for(var exp: expRel){
-            System.out.println(exp.lexicalCompRank(0));
+            
             switch (exp.lexicalCompRank(0)) {
                 case "F_REVISAR", "VerAdelante", "VerAtras", "VerDerecha", "VerIzquierda" -> {
                     //Verificar si el primer termino es un método, entonces el segundo debe ser booleano
@@ -1684,15 +1710,15 @@ public class Compilador extends javax.swing.JFrame {
                     }else {
                         if (!idTipoDato.get(td1).equals(exp.lexicalCompRank(-1)) && !(td1.equals("ENT") || td1.equals("BOOL"))) {
                             errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
-                            System.out.println("1");
+                            
                             break;
                         } else if (td1.equals("ENT") && !(exp.lexicalCompRank(-1).equals("Numero_Entero") || exp.lexicalCompRank(-1).equals("Numero_Mini"))) {
                             errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
-                            System.out.println("2");
+                            
                             break;
                         } else if (td1.equals("BOOL") && !(exp.lexicalCompRank(-1).equals("Verdadero") || exp.lexicalCompRank(-1).equals("Falso"))) {
                             errores.add(new ErrorLSSL(60, "Error Semantico {} en la linea #, expresión lógica incorrecta, no se pueden comparar los tipos de dato.", exp, true));
-                            System.out.println("3");
+                           
                             break;
                         }
                     }//FIN IF-ELSE
@@ -1842,9 +1868,60 @@ public class Compilador extends javax.swing.JFrame {
               } 
         }//for repetir
         
-        
-     
     }//FIN SEMANTICO
+    
+    private void generarCodigoIntermedio(ArrayList<String> codigoDiv, int repetir){
+        //Aqui vamos a generar el codigo intermedio
+        for(int i=1; i<=repetir; i++){
+            int control = -1; //es una mauskerramienta q nos servira para mas adelante
+            for(var bloquesCod: codigoDiv){
+                if(control != -1){
+                    int[] posMarcs = CodeBlock.getPositionOfBothMarkers(codigoDiv, bloquesCod);
+                    generarCodigoIntermedio((ArrayList<String>)codigoDiv.subList(posMarcs[0], posMarcs[1]), control);
+                    System.out.println(control);
+                    control = -1;
+                    break;//especulacion mia
+                }else{
+                    String[] sentencias = bloquesCod.split(";");
+                    for(var sentencia:sentencias){
+                        //aqui vamos a poner los posibles casos
+                        sentencia = sentencia.trim();
+                        if(sentencia.startsWith("CONF")){
+                            System.out.println("Declaracion de variable");
+                        }else if(sentencia.startsWith("VECT")){
+                            System.out.println("Declaracion de vector");
+                        }else if(sentencia.startsWith("DEF")){
+                            System.out.println("Definicion de metodo");
+                        }else if(sentencia.split(" ")[0].matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}") ){ //.matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")
+                            if(sentencia.endsWith(")")){
+                                System.out.println("Llamado a Funcion");
+                            }else{
+                                System.out.println("Asignacion a variable");
+                            }
+                        }else if(sentencia.startsWith("SI") || sentencia.startsWith("SINO")){
+                            System.out.println("Sentencia SI/SINO");
+                        }else if(sentencia.startsWith("MIENTRAS")){
+                            System.out.println("Sentencia MIENTRAS");
+                        }else if(sentencia.startsWith("REPETIR")){
+                            System.out.println("Sentencia REPETIR");
+                        }else if(sentencia.startsWith("ADELANTE")){
+                            System.out.println("AVANZANDO DE FRENTE");
+                        }else if(sentencia.startsWith("ATRAS")){
+                            System.out.println("YENDO PA ATRAS");
+                        }else if(sentencia.startsWith("IZQUIERDA")){
+                            System.out.println("AVANZANDO A LA IZQUIERDA");
+                        }else if(sentencia.startsWith("DERECHA")){
+                            System.out.println("AVANZANDO A LA DERECHA");
+                        }else if(sentencia.startsWith("PARAR")){
+                            System.out.println("DETENER TODO MOVIMIENTO");
+                        }else if(sentencia.startsWith("REVISAR")){
+                            System.out.println("Revisando contenido");
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private void cambioColor() {
         /* Limpiar el arreglo de colores */
@@ -2025,6 +2102,7 @@ public class Compilador extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextPane areaCodigo;
     private javax.swing.JButton btnAbrir;
+    private javax.swing.JButton btnCodInt;
     private javax.swing.JButton btnCompilar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnGuardarC;

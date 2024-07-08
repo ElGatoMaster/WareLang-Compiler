@@ -13,7 +13,6 @@ CONF MINI cont = 0;
 
 //DECLARACION METODOS
 DEF metodoSP(){
-	h = 1;
    SI(REVISAR(#000000,12)==VERDADERO){
       buscados[cont] = 'producto1';
       encontrado = VERDADERO;
@@ -29,6 +28,7 @@ DEF metodoSP(){
 
 DEF metodoS(){
    //cadena = 'prueba';
+   CONF DEC nomas = 1.5;
 }
 
 DEF avanzarConCuidado(){
