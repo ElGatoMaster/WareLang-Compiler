@@ -34,7 +34,7 @@ DEF metodoS(){
 DEF avanzarConCuidado(){
    SI(VERADELANTE()==VERDADERO){
       ADELANTE(1,2);
-      x+=1;
+      x-=1;
    }SINO{
       PARAR();
       SI(VERDERECHA()==VERDADERO){

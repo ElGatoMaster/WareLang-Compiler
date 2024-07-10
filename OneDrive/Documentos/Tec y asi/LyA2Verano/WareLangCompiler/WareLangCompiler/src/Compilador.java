@@ -42,7 +42,6 @@ import javax.swing.text.StyleContext;
  * @author rebek
  */
 public class Compilador extends javax.swing.JFrame {
-
     private String titulo;
     private Directory directorio;
     private ArrayList<Token> tokens;
@@ -77,6 +76,8 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> asignVec;
     private ArrayList<Production> expRel;
    
+    //Codigo intermedio
+    String codigoIntermedio;
 
     /**
      * Creates new form Compilador
@@ -147,6 +148,9 @@ public class Compilador extends javax.swing.JFrame {
         
         errores = new ArrayList();
         textocolor = new ArrayList<>();
+        
+        //Generar codigo intermedio
+        codigoIntermedio = "";
 
         estadoCompilacion = true;
         //tablaSimbolos.setVisible(false);
@@ -619,9 +623,6 @@ public class Compilador extends javax.swing.JFrame {
 
     private void analisisSintactico() {
         Grammar gramatica = new Grammar(tokens, errores);
-        
-        
-        
 
         //Eliminacin de errores Lexicos
         gramatica.delete("ERROR", 1, "Error léxico ({}): En la línea #, Cadena inválida");
@@ -1872,6 +1873,7 @@ public class Compilador extends javax.swing.JFrame {
     
     private void generarCodigoIntermedio(ArrayList<String> codigoDiv, int repetir){
         //Aqui vamos a generar el codigo intermedio
+        int temp = 0;
         for(int i=1; i<=repetir; i++){
             int control = -1; //es una mauskerramienta q nos servira para mas adelante
             for(var bloquesCod: codigoDiv){
@@ -1885,43 +1887,68 @@ public class Compilador extends javax.swing.JFrame {
                     String[] sentencias = bloquesCod.split(";");
                     for(var sentencia:sentencias){
                         //aqui vamos a poner los posibles casos
-                        sentencia = sentencia.trim();
+                        sentencia = sentencia.trim(); //quitar los espacios al inicio y al final pq luego no lo detecta
                         if(sentencia.startsWith("CONF")){
-                            System.out.println("Declaracion de variable");
+                            
+                            codigoIntermedio += "Declaracion de variable \n";
                         }else if(sentencia.startsWith("VECT")){
-                            System.out.println("Declaracion de vector");
+                            
+                            codigoIntermedio += "Declaracion de vector \n";
                         }else if(sentencia.startsWith("DEF")){
-                            System.out.println("Definicion de metodo");
+                            
+                            codigoIntermedio += "Definicion de metodo \n";
                         }else if(sentencia.split(" ")[0].matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}") ){ //.matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")
                             if(sentencia.endsWith(")")){
-                                System.out.println("Llamado a Funcion");
+                                
+                                codigoIntermedio += "Llamado a Funcion \n";
                             }else{
-                                System.out.println("Asignacion a variable");
+                                codigoIntermedio += "Asignacion a variable \n";
+                                String t[] = sentencia.split(" ");
+                                //System.out.println(sentencia);
+                                if(t[1].startsWith("=")){
+                                    codigoIntermedio += t[0]+" = "+t[t.length-1]+" \n";
+                                }else if(t[1].startsWith("+") || t[1].startsWith("-")){
+                                    temp++;
+                                    codigoIntermedio += "T"+temp+" = "+t[0]+" \n";
+                                    temp++;
+                                    codigoIntermedio += "T"+temp+" = "+"T"+--temp+t[1].charAt(0)+t[t.length-1]+" \n";
+                                    temp++;
+                                    codigoIntermedio += t[0]+" = "+"T"+temp+" \n";
+                                }
                             }
                         }else if(sentencia.startsWith("SI") || sentencia.startsWith("SINO")){
-                            System.out.println("Sentencia SI/SINO");
+                           
+                            codigoIntermedio += "Sentencia SI/SINO \n";
                         }else if(sentencia.startsWith("MIENTRAS")){
-                            System.out.println("Sentencia MIENTRAS");
+                            
+                            codigoIntermedio += "Sentencia MIENTRAS \n";
                         }else if(sentencia.startsWith("REPETIR")){
-                            System.out.println("Sentencia REPETIR");
+                            
+                            codigoIntermedio += "Sentencia REPETIR \n";
                         }else if(sentencia.startsWith("ADELANTE")){
-                            System.out.println("AVANZANDO DE FRENTE");
+                            
+                            codigoIntermedio += "AVANZANDO DE FRENTE \n";
                         }else if(sentencia.startsWith("ATRAS")){
-                            System.out.println("YENDO PA ATRAS");
+
+                            codigoIntermedio += "YENDO PA ATRAS \n";
                         }else if(sentencia.startsWith("IZQUIERDA")){
-                            System.out.println("AVANZANDO A LA IZQUIERDA");
+                            
+                            codigoIntermedio += "AVANZANDO A LA IZQUIERDA \n";
                         }else if(sentencia.startsWith("DERECHA")){
-                            System.out.println("AVANZANDO A LA DERECHA");
+                            
+                            codigoIntermedio += "AVANZANDO A LA DERECHA \n";
                         }else if(sentencia.startsWith("PARAR")){
-                            System.out.println("DETENER TODO MOVIMIENTO");
+                            codigoIntermedio += "DETENER TODO MOVIMIENTO \n";
                         }else if(sentencia.startsWith("REVISAR")){
-                            System.out.println("Revisando contenido");
+                            
+                            codigoIntermedio += "Revisando contenido \n";
                         }
-                    }
-                }
-            }
-        }
-    }
+                    }//For de las sentencias
+                }//Bloque del if-else principal
+            }//bloques de codigo
+        }//for para los bloques que se deban repetir
+        System.out.println(codigoIntermedio);
+    }//FINAL DE LA GENERACION de CodigoINtermedio
 
     private void cambioColor() {
         /* Limpiar el arreglo de colores */
