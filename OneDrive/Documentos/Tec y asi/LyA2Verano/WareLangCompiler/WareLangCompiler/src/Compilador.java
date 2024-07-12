@@ -1909,10 +1909,7 @@ public class Compilador extends javax.swing.JFrame {
                                     codigoIntermedio += t[0]+" = "+t[t.length-1]+" \n";
                                 }else if(t[1].startsWith("+") || t[1].startsWith("-")){
                                     temp++;
-                                    codigoIntermedio += "T"+temp+" = "+t[0]+" \n";
-                                    temp++;
-                                    codigoIntermedio += "T"+temp+" = "+"T"+--temp+t[1].charAt(0)+t[t.length-1]+" \n";
-                                    temp++;
+                                    codigoIntermedio += "T"+temp+" = "+t[0]+t[1].charAt(0)+t[t.length-1]+" \n";
                                     codigoIntermedio += t[0]+" = "+"T"+temp+" \n";
                                 }
                             }
