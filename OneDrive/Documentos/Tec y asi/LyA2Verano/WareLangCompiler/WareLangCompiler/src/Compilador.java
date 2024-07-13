@@ -78,6 +78,7 @@ public class Compilador extends javax.swing.JFrame {
    
     //Codigo intermedio
     String codigoIntermedio;
+    String cuidameloTantito;
 
     /**
      * Creates new form Compilador
@@ -151,6 +152,7 @@ public class Compilador extends javax.swing.JFrame {
         
         //Generar codigo intermedio
         codigoIntermedio = "";
+        cuidameloTantito = "";
 
         estadoCompilacion = true;
         //tablaSimbolos.setVisible(false);
@@ -564,15 +566,15 @@ public class Compilador extends javax.swing.JFrame {
     private void btnCodIntActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCodIntActionPerformed
         //Se genera el codigo intermedio aqui en caliente.
         if(estadoCompilacion && errores.isEmpty()){
-            //Pasos para el codigo intermedio
-            //CodeBlock codigoFuente = 
             ArrayList<String> codigoDividido = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";").getBlocksOfCodeInOrderOfExec();
-            //System.out.println(codigoDividido);
             generarCodigoIntermedio(codigoDividido,1);
         }else{
             JOptionPane.showMessageDialog(null, "No se puede generar el codigo intermedio porque el programa contiene errores...",
                     "Error en la generacion de codigo", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+        System.out.println("Primero \n"+codigoIntermedio);
+        System.out.println("Segundo \n"+cuidameloTantito);
     }//GEN-LAST:event_btnCodIntActionPerformed
 
     private void compile() {
@@ -919,7 +921,41 @@ public class Compilador extends javax.swing.JFrame {
         
             gramatica.finalLineColumn();
                 
-
+       
+    //**********************************METODOS IMPRM  ***********************
+        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor | Numero | Identificador |Expresion) Coma (Valor| Numero | Identificador|Expresion|OpImpr) Par_cer", FuncionImprimir);
+        
+        gramatica.group("EstImpr", "F_IMPR ",19,
+                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
+           
+        gramatica.group("EstImpr", "F_IMPR Par_abr Numero Coma OpImpr Par_cer",32,
+                "Error sintáctico (32): En la línea #, No se permite un numero como mensaje a imprimir.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Par_cer",20,
+                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
+        gramatica.group("EstImpr", "F_IMPR  (Par_abr)+ (Valor|metListaSacar) Coma OpImpr Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstImpr", "F_IMPR (Par_abr)+ Par_abr (Valor|metListaSacar) Coma OpImpr (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Coma Par_cer",20,
+                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma Par_cer",30,
+                "Error sintáctico (30): En la línea #, Falta donde se imprimirá el mensaje.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Coma OpImpr Par_cer",31,
+                "Error sintáctico (31): En la línea #, Falta mensaje a imprimir.");
+        
+        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma OpImpr ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+         gramatica.group("EstImpr", "F_IMPR Valor Coma OpImpr Par_cer ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+        
+         gramatica.finalLineColumn(); 
        
 
         //********************************** EST REVISAR **************************
@@ -965,44 +1001,6 @@ public class Compilador extends javax.swing.JFrame {
     
         
         
-       
-    //**********************************METODOS IMPRM  ***********************
-        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor | Numero | Identificador) Coma (Valor| Numero | Identificador) Par_cer", FuncionImprimir);
-        
-        gramatica.group("EstImpr", "F_IMPR ",19,
-                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
-        
-        gramatica.group("EstRevisar", "F_IMPR Par_abr (Valor|metListaSacar) (Coma)+ OpImpr Par_cer",55,
-                    "Error sintáctico (55): En la línea #, Sintaxis incorrecta comas de más");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Numero Coma OpImpr Par_cer",32,
-                "Error sintáctico (32): En la línea #, No se permite un numero como mensaje a imprimir.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Par_cer",20,
-                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
-        gramatica.group("EstImpr", "F_IMPR  (Par_abr)+ (Valor|metListaSacar) Coma OpImpr Par_cer (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("EstImpr", "F_IMPR (Par_abr)+ Par_abr (Valor|metListaSacar) Coma OpImpr (Par_cer)+ ",49,
-                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Coma Par_cer",20,
-                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma Par_cer",30,
-                "Error sintáctico (30): En la línea #, Falta donde se imprimirá el mensaje.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Coma OpImpr Par_cer",31,
-                "Error sintáctico (31): En la línea #, Falta mensaje a imprimir.");
-        
-        gramatica.group("EstImpr", "F_IMPR Par_abr Valor Coma OpImpr ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-         gramatica.group("EstImpr", "F_IMPR Valor Coma OpImpr Par_cer ",18,
-                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
-        
-        
-         gramatica.finalLineColumn(); 
 
      
         
@@ -1871,80 +1869,196 @@ public class Compilador extends javax.swing.JFrame {
         
     }//FIN SEMANTICO
     
-    private void generarCodigoIntermedio(ArrayList<String> codigoDiv, int repetir){
+    int cLBL=1;
+    //Variables a usar: codigoIntermedio y cuidameloTantito
+    //Para controlar donde van las sentencias, o dentro de q nivel, propongo usar la variable control, posibles valores 1 y 2
+    private void generarCodigoIntermedio(ArrayList<String> codigoDiv, int control){
         //Aqui vamos a generar el codigo intermedio
-        int temp = 0;
-        for(int i=1; i<=repetir; i++){
-            int control = -1; //es una mauskerramienta q nos servira para mas adelante
-            for(var bloquesCod: codigoDiv){
-                if(control != -1){
-                    int[] posMarcs = CodeBlock.getPositionOfBothMarkers(codigoDiv, bloquesCod);
-                    generarCodigoIntermedio((ArrayList<String>)codigoDiv.subList(posMarcs[0], posMarcs[1]), control);
-                    System.out.println(control);
-                    control = -1;
-                    break;//especulacion mia
-                }else{
-                    String[] sentencias = bloquesCod.split(";");
-                    for(var sentencia:sentencias){
-                        //aqui vamos a poner los posibles casos
-                        sentencia = sentencia.trim(); //quitar los espacios al inicio y al final pq luego no lo detecta
-                        if(sentencia.startsWith("CONF")){
-                            
-                            codigoIntermedio += "Declaracion de variable \n";
-                        }else if(sentencia.startsWith("VECT")){
-                            
-                            codigoIntermedio += "Declaracion de vector \n";
-                        }else if(sentencia.startsWith("DEF")){
-                            
-                            codigoIntermedio += "Definicion de metodo \n";
-                        }else if(sentencia.split(" ")[0].matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}") ){ //.matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")
-                            if(sentencia.endsWith(")")){
-                                
-                                codigoIntermedio += "Llamado a Funcion \n";
-                            }else{
-                                codigoIntermedio += "Asignacion a variable \n";
-                                String t[] = sentencia.split(" ");
-                                //System.out.println(sentencia);
-                                if(t[1].startsWith("=")){
-                                    codigoIntermedio += t[0]+" = "+t[t.length-1]+" \n";
-                                }else if(t[1].startsWith("+") || t[1].startsWith("-")){
-                                    temp++;
-                                    codigoIntermedio += "T"+temp+" = "+t[0]+t[1].charAt(0)+t[t.length-1]+" \n";
-                                    codigoIntermedio += t[0]+" = "+"T"+temp+" \n";
-                                }
+        int temp = 0;int si=0;
+        //codigoDiv tiene todas sentencias contenidas por los bloques de codigo delimitados por { y }
+        //bloquesCod representa cada uno de esos bloques de codigo, que puede tener mas de una
+        // sentencia, ya sean declaraciones, metodos de movimiento o estructuras de control
+        for (int x=0; x<codigoDiv.size();x++) {
+            String bloquesCod = codigoDiv.get(x);
+            //System.out.println((si++) + "-" + bloquesCod + "\n");
+            String[] sentencias = bloquesCod.split(";");
+            for (var sentencia : sentencias) {
+                //aqui vamos a poner los posibles casos
+                sentencia = sentencia.trim(); //quitar los espacios al inicio y al final pq luego no lo detecta
+                if (sentencia.startsWith("CLASE")) {
+                    codigoIntermedio += "INICIO: \n";
+                } else if (sentencia.startsWith("CONF")) {
+                    String s[] = sentencia.split(" "); //conf td id *opas* *val*
+                    if (s.length > 3) {
+                        codigoIntermedio += s[2] + " = " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
+                    } else {
+                        switch (s[1]) {
+                            case "CAD" -> {
+                                codigoIntermedio += s[2] + " = '' \n";
                             }
-                        }else if(sentencia.startsWith("SI") || sentencia.startsWith("SINO")){
-                           
-                            codigoIntermedio += "Sentencia SI/SINO \n";
-                        }else if(sentencia.startsWith("MIENTRAS")){
-                            
-                            codigoIntermedio += "Sentencia MIENTRAS \n";
-                        }else if(sentencia.startsWith("REPETIR")){
-                            
-                            codigoIntermedio += "Sentencia REPETIR \n";
-                        }else if(sentencia.startsWith("ADELANTE")){
-                            
-                            codigoIntermedio += "AVANZANDO DE FRENTE \n";
-                        }else if(sentencia.startsWith("ATRAS")){
-
-                            codigoIntermedio += "YENDO PA ATRAS \n";
-                        }else if(sentencia.startsWith("IZQUIERDA")){
-                            
-                            codigoIntermedio += "AVANZANDO A LA IZQUIERDA \n";
-                        }else if(sentencia.startsWith("DERECHA")){
-                            
-                            codigoIntermedio += "AVANZANDO A LA DERECHA \n";
-                        }else if(sentencia.startsWith("PARAR")){
-                            codigoIntermedio += "DETENER TODO MOVIMIENTO \n";
-                        }else if(sentencia.startsWith("REVISAR")){
-                            
-                            codigoIntermedio += "Revisando contenido \n";
+                            case "FREC" -> {
+                                codigoIntermedio += s[2] + " = 20 \n";
+                            }
+                            case "BOOL" -> {
+                                codigoIntermedio += s[2] + " = V \n";
+                            }
+                            case "COLOR" -> {
+                                codigoIntermedio += s[2] + " = #000000 \n";
+                            }
+                            default -> {
+                                codigoIntermedio += s[2] + " = " + 0 + "\n";
+                            }
                         }
-                    }//For de las sentencias
-                }//Bloque del if-else principal
-            }//bloques de codigo
-        }//for para los bloques que se deban repetir
-        System.out.println(codigoIntermedio);
+                    }
+                } else if (sentencia.startsWith("VECT")) {
+                    String s[]=sentencia.split(" ");//vect td id [ v ] || vect td id = [ * ]
+                    if(s[3].equals("=")){
+                        codigoIntermedio+=s[2]+" = "+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()-1)+"] \n";
+                    }else{
+                        int t = Integer.parseInt(s[4]);
+                        String l ="";
+                        for(int i = 0; i < t; i++) {
+                            l+=" 0 ,";
+                        }
+                        codigoIntermedio+=s[2]+" = ["+ l.substring(0, l.lastIndexOf(","))+"] \n";
+                    }
+                    //codigoIntermedio += "Declaracion de vector \n";
+                    
+                } else if (sentencia.startsWith("DEF")) {
+                    String s[] = sentencia.split(" ");
+                    if (s[1].equals("principal")) {
+                        codigoIntermedio += "PRINCIPAL: \n";
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 1);
+                        x=pos[1];
+                        break;
+                    } else {
+                        cuidameloTantito += "PROC "+s[1].toUpperCase()+": \n";
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 2);
+                        x=pos[1];
+                        break;
+                        //codigoIntermedio += "Definicion de metodo \n";
+                    }
+
+                } else if (sentencia.split(" ")[0].matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")) { //.matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")
+                    if (sentencia.endsWith(")")) {
+                        
+                        if(control==1){
+                            codigoIntermedio += "Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
+                        }else{
+                            cuidameloTantito+="Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
+                        }
+                        
+                    } else {
+                        //codigoIntermedio += "Asignacion a variable \n";
+                        String local = "Asignacion a variable \n";
+                        String t[] = sentencia.split(" ");
+                        if (t[1].startsWith("=")) {
+                            local += t[0] + " = " + t[t.length - 1] + " \n";
+                        } else if (t[1].startsWith("+") || t[1].startsWith("-")) {
+                            temp++;
+                            local += "T" + temp + " = " + t[0] + t[1].charAt(0) + t[t.length - 1] + " \n";
+                            local += t[0] + " = " + "T" + temp + " \n";
+                        }
+                        if(control==1){
+                            codigoIntermedio+=local;
+                        }else{
+                            cuidameloTantito+=local;
+                        }
+                    }
+                } else if (sentencia.startsWith("SI") || sentencia.startsWith("SINO")) {
+                    String local="LBL"+(cLBL)+":\n";cLBL++;
+                    if(sentencia.startsWith("SI ")){
+                        local+="if "+sentencia.substring(sentencia.indexOf(" ("),sentencia.lastIndexOf(" )"))
+                                +" goto LBL"+(cLBL+1)+"\n";
+                    }else{//si la palabra es SINO
+                        local="";
+                    }
+                    if(control==1){
+                        codigoIntermedio += local +"LBL"+cLBL+":\n";
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
+                        x=pos[1];
+                        break;
+                    }else{
+                        cuidameloTantito += local +"LBL"+cLBL+":\n";
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
+                        x=pos[1];
+                        break;
+                    }
+                    
+                } else if (sentencia.startsWith("MIENTRAS")) {
+                    if(control==1){
+                        codigoIntermedio += "Sentencia MIENTRAS \n";
+                    }else{
+                        cuidameloTantito += "Sentencia MIENTRAS \n";
+                    }
+                    
+                } else if (sentencia.startsWith("REPETIR")) {
+                    if(control==1){
+                        codigoIntermedio += "Sentencia REPETIR \n";
+                    }else{
+                        cuidameloTantito += "Sentencia REPETIR \n";
+                    }
+                    
+                } else if (sentencia.startsWith("ADELANTE")) {
+                    if(control==1){
+                        codigoIntermedio += "AVANZANDO DE FRENTE \n";
+                    }else{
+                        cuidameloTantito += "AVANZANDO DE FRENTE \n";
+                    }
+                    
+                } else if (sentencia.startsWith("ATRAS")) {
+                    if(control==1){
+                        codigoIntermedio += "YENDO PA ATRAS \n";
+                    }else{
+                        cuidameloTantito += "YENDO PA ATRAS \n";
+                    }
+                    
+                } else if (sentencia.startsWith("IZQUIERDA")) {
+                    if(control==1){
+                        codigoIntermedio += "AVANZANDO A LA IZQUIERDA \n";
+                    }else{
+                        cuidameloTantito += "AVANZANDO A LA IZQUIERDA \n";
+                    }
+                    
+                } else if (sentencia.startsWith("DERECHA")) {
+                    if(control==1){
+                        codigoIntermedio += "AVANZANDO A LA DERECHA \n";
+                    }else{
+                        cuidameloTantito += "AVANZANDO A LA DERECHA \n";
+                    }
+                    
+                } else if (sentencia.startsWith("PARAR")) {
+                    if(control==1){
+                        codigoIntermedio += "DETENER TODO MOVIMIENTO \n";
+                    }else{
+                        cuidameloTantito += "DETENER TODO MOVIMIENTO \n";
+                    }
+                    
+                } else if (sentencia.startsWith("REVISAR")) {
+                    if(control==1){
+                        codigoIntermedio += "Revisando contenido \n";
+                    }else{
+                        cuidameloTantito += "Revisando contenido \n";
+                    }
+                    
+                }else if(sentencia.startsWith("IMPR")){
+                    if(control==1){
+                        codigoIntermedio+="Imprimiendo mensaje \n";
+                    }else{
+                        cuidameloTantito+="Imprimiendo mensaje \n";
+                    }
+                }
+                
+            }//For de las sentencias
+            //codigoIntermedio+="\n";
+            //cuidameloTantito+="\n";
+        }//bloques de codigo
+        
+        
     }//FINAL DE LA GENERACION de CodigoINtermedio
 
     private void cambioColor() {
