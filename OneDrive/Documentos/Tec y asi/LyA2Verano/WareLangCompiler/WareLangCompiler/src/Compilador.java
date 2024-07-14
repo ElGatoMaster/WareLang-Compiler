@@ -1998,11 +1998,20 @@ public class Compilador extends javax.swing.JFrame {
                     
                 } else if (sentencia.startsWith("REPETIR")) {
                     if(control==1){
-                        codigoIntermedio += "Sentencia REPETIR \n";
+                        codigoIntermedio +="LBL"+cLBL+":\n";int spt=cLBL;
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
+                        x=pos[1];
+                        codigoIntermedio+="LOOP LBL"+spt+"\n";cLBL++;
+                        break;
                     }else{
-                        cuidameloTantito += "Sentencia REPETIR \n";
+                        cuidameloTantito += "LBL"+cLBL+":\n";cLBL++;int spt=cLBL;
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
+                        x=pos[1];
+                        cuidameloTantito+="LOOP LBL"+spt+"\n";cLBL++;
+                        break;
                     }
-                    
                 } else if (sentencia.startsWith("ADELANTE")) {
                     if(control==1){
                         codigoIntermedio += "AVANZANDO DE FRENTE \n";
