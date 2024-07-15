@@ -73,8 +73,8 @@ DEF principal(){
    x+=1;
    recorridoCanelitas();
    tomarHay();  
-   //IMPRVECTOR(buscados,3); 
-   //IMPRVECTOR(estado,3); 
+   IMPRVECTOR(buscados,3); 
+   IMPRVECTOR(estado,3); 
    IMPR(fin,CONSOL); 
  }
 

@@ -70,6 +70,7 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> FuncionCaja;
     private ArrayList<Production> FuncionRevisar;
     private ArrayList<Production> FuncionImprimir;
+    private ArrayList<Production> FuncionImprimirVec;
     private ArrayList<Production> DefinirMetodos;
     private ArrayList<Production> funcRepetir;
     
@@ -139,6 +140,7 @@ public class Compilador extends javax.swing.JFrame {
         FuncionCaja = new ArrayList<>();
         FuncionRevisar = new ArrayList<>();
         FuncionImprimir = new ArrayList<>();
+        FuncionImprimirVec = new ArrayList<>();
         DefinirMetodos = new ArrayList<>();
         expRel = new ArrayList<>();
 
@@ -956,6 +958,47 @@ public class Compilador extends javax.swing.JFrame {
         
         
          gramatica.finalLineColumn(); 
+         
+         
+        
+           
+       //**********************************METODOS IMPRM VECTOR ***********************
+        gramatica.group("EstImprVec", "ImprVector Par_abr (Valor | Numero | Identificador |Expresion) Coma (Valor| Numero | Identificador|Expresion) Par_cer", FuncionImprimirVec);
+        
+        gramatica.group("EstImprVec", "ImprVector",19,
+                "Error sintáctico (19): En la línea #, Estructura inválida del método.");
+           
+        gramatica.group("EstImprVec", "ImprVector Par_abr Numero Coma OpImpr Par_cer",32,
+                "Error sintáctico (32): En la línea #, No se permite un numero como mensaje a imprimir.");
+        
+        gramatica.group("EstImprVec", "ImprVector Par_abr Par_cer",20,
+                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
+        gramatica.group("EstImprVec", "F_IMPR  (Par_abr)+ (Valor|metListaSacar) Coma OpImpr Par_cer (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstImprVec", "ImprVector (Par_abr)+ Par_abr (Valor|metListaSacar) Coma OpImpr (Par_cer)+ ",49,
+                "Error sintáctico (49): En la línea #, Existen paréntesis de más."); 
+        
+        gramatica.group("EstImprVec", "ImprVector Par_abr Coma Par_cer",20,
+                "Error sintáctico (27): En la línea #, Falta valores en los parámetros.");
+        
+        gramatica.group("EstImprVec", "ImprVector Par_abr Valor Coma Par_cer",30,
+                "Error sintáctico (30): En la línea #, Falta donde se imprimirá el mensaje.");
+        
+        gramatica.group("EstImprVec", "ImprVector Par_abr Coma OpImpr Par_cer",31,
+                "Error sintáctico (31): En la línea #, Falta mensaje a imprimir.");
+        
+        gramatica.group("EstImprVec", "ImprVector Par_abr Valor Coma OpImpr ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+         gramatica.group("EstImprVec", "ImprVector Valor Coma OpImpr Par_cer ",18,
+                "Error sintáctico (18): En la línea #, Falta abrir o cerrar paréntesis ().");
+        
+         gramatica.finalLineColumn();   
+         
+         
+         
+         
        
 
         //********************************** EST REVISAR **************************
@@ -1186,9 +1229,9 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {          
             gramatica.group("Sentencia", " ( EstControl | SentenciasPunto | ERRORES)+");
             gramatica.group("SentenciasPunto", "(MetodoEstatique | Asignacion | ExpresionDos  | EstCaja | EstAlarma | F_MOV"
-                    + "| EstImpr) Punto_coma");
+                    + "| EstImpr |EstImprVec) Punto_coma");
             gramatica.group("SentenciasPunto", "(MetodoEstatique | Asignacion | ExpresionDos | EstCaja | EstAlarma | F_MOV"
-                    + "| EstImpr)",11,
+                    + "| EstImpr | EstImprVec)",11,
                     "Error sintáctico (9): En la línea #, Falta punto y coma al final de la linea");
             gramatica.group("DeclaracionesF", "(Declaraciones)+");
             gramatica.group("Sentencias", "(Sentencia | Sentencia Sentencias)+");
@@ -1599,6 +1642,43 @@ public class Compilador extends javax.swing.JFrame {
 
         }//Imprimir
         
+        
+        
+         //******************** MÉTODO IMPRIMIR VECTOR*******************
+    
+        for (Production ImprimirVec: FuncionImprimirVec) {
+            String id = ImprimirVec.lexemeRank(2);
+            String td = "";
+
+            if (ImprimirVec.lexicalCompRank(2).equals("Identificador")) {
+                for (var v : idVector) {
+                    if (v[0].equals(id)) {
+                        td = v[1];
+                        if (!(td.equals("CAD"))) {
+                            errores.add(new ErrorLSSL(58, "Error Semantico {} en la linea #, tipo de vector no permitido", ImprimirVec, true));
+                            break;
+                        }
+                    } 
+                }
+                
+                if(td.equals("")){
+                    errores.add(new ErrorLSSL(55, "Error Semantico {} en la linea #, la variable no ha sido declarada", ImprimirVec, true));
+                    break;
+               }  
+            }else{
+                errores.add(new ErrorLSSL(59, "Error Semantico {} en la linea #, cadenas de texto no permitidas, solo vectores", ImprimirVec, true));
+                break;
+            }
+  
+           if (!ImprimirVec.lexicalCompRank(4).equals("Numero_Entero") && !ImprimirVec.lexicalCompRank(4).equals("Numero_Mini")) {
+                    errores.add(new ErrorLSSL(56, "Error Semantico {} en la linea #, El valor asignado no corresponde con el parámetro esperado por el método", ImprimirVec, true));
+
+            }
+
+        }//Imprimir Vector
+        
+        
+        
         //-----------ERRORES en la ASIGNACION DE VECTORES
         for(var av: asignVec){
             String id = av.lexemeRank(0);
@@ -1998,67 +2078,103 @@ public class Compilador extends javax.swing.JFrame {
                     
                 } else if (sentencia.startsWith("REPETIR")) {
                     if(control==1){
-                        codigoIntermedio +="LBL"+cLBL+":\n";int spt=cLBL;
+                        codigoIntermedio +="\nLBL "+cLBL+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";cLBL++;int spt=cLBL;
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        codigoIntermedio+="LOOP LBL"+spt+"\n";cLBL++;
+                        codigoIntermedio+="LOOP LBL"+spt+"\n\n";cLBL++;
                         break;
                     }else{
-                        cuidameloTantito += "LBL"+cLBL+":\n";cLBL++;int spt=cLBL;
+                        cuidameloTantito += "\nLBL "+cLBL+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";cLBL++;int spt=cLBL;
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        cuidameloTantito+="LOOP LBL"+spt+"\n";cLBL++;
+                        cuidameloTantito+="LOOP LBL"+spt+"\n\n";cLBL++;
                         break;
                     }
                 } else if (sentencia.startsWith("ADELANTE")) {
                     if(control==1){
-                        codigoIntermedio += "AVANZANDO DE FRENTE \n";
+                        codigoIntermedio += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
-                        cuidameloTantito += "AVANZANDO DE FRENTE \n";
+                        cuidameloTantito += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("ATRAS")) {
                     if(control==1){
-                        codigoIntermedio += "YENDO PA ATRAS \n";
+                        codigoIntermedio += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
-                        cuidameloTantito += "YENDO PA ATRAS \n";
+                        cuidameloTantito += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("IZQUIERDA")) {
                     if(control==1){
-                        codigoIntermedio += "AVANZANDO A LA IZQUIERDA \n";
+                        codigoIntermedio +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
-                        cuidameloTantito += "AVANZANDO A LA IZQUIERDA \n";
+                        cuidameloTantito +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("DERECHA")) {
                     if(control==1){
-                        codigoIntermedio += "AVANZANDO A LA DERECHA \n";
+                        codigoIntermedio += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
-                        cuidameloTantito += "AVANZANDO A LA DERECHA \n";
+                        cuidameloTantito += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("PARAR")) {
                     if(control==1){
-                        codigoIntermedio += "DETENER TODO MOVIMIENTO \n";
+                        codigoIntermedio += "   MACRO_PARAR\n";
                     }else{
-                        cuidameloTantito += "DETENER TODO MOVIMIENTO \n";
+                        cuidameloTantito += "   MACRO_PARAR\n";
                     }
                     
                 } else if (sentencia.startsWith("REVISAR")) {
                     if(control==1){
-                        codigoIntermedio += "Revisando contenido \n";
+                        codigoIntermedio +="   MACRO_REVISAR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
-                        cuidameloTantito += "Revisando contenido \n";
+                        cuidameloTantito += "   MACRO_REVISAR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
+                }else if(sentencia.startsWith("IMPRVECTOR")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_IMPR_VECTOR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_IMPR_VECTOR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                    }
                 }else if(sentencia.startsWith("IMPR")){
                     if(control==1){
-                        codigoIntermedio+="Imprimiendo mensaje \n";
+                        codigoIntermedio+="   MACRO_IMPR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
-                        cuidameloTantito+="Imprimiendo mensaje \n";
+                        cuidameloTantito+="   MACRO_IMPR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                    }
+                }else if(sentencia.startsWith("ALARMA")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_ALARMA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_ALARMA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                    }
+                }else if(sentencia.startsWith("PRENDER")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_PRENDER \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_PRENDER \n";
+                    }
+                }else if(sentencia.startsWith("PRENDER")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_TOMAR \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_TOMAR  \n";
+                    }
+                }else if(sentencia.startsWith("SOLTAR")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_SOLTAR \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_SOLTAR \n";
+                    }
+                }else if(sentencia.startsWith("LIMPIAR")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_LIMPIAR \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_LIMPIAR \n";
                     }
                 }
                 
@@ -2182,6 +2298,7 @@ public class Compilador extends javax.swing.JFrame {
         FuncionesMovimiento.clear();
         FuncionRevisar.clear();
         FuncionImprimir.clear();
+        FuncionImprimirVec.clear();
         DefinirMetodos.clear();
         identValor.clear();
         FuncionAlarma.clear();

@@ -141,6 +141,7 @@ VERADELANTE { return token(yytext(), "VerAdelante", yyline, yycolumn); }
 VERATRAS { return token(yytext(), "VerAtras", yyline, yycolumn); }
 VERIZQUIERDA { return token(yytext(), "VerIzquierda", yyline, yycolumn); }
 VERDERECHA { return token(yytext(), "VerDerecha", yyline, yycolumn); }
+IMPRVECTOR { return token(yytext(), "ImprVector", yyline, yycolumn); }
 /*MATRIZ { return token(yytext(), "MATRIZ", yyline, yycolumn); }*/
 
 
