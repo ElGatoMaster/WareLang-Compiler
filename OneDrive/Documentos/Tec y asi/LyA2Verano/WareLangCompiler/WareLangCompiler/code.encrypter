@@ -4,17 +4,18 @@ CLASE principal{
     CONF COLOR colorVacio = #70FF00; 
     CONF CAD producto = 'Zucaritas';
 
-    
-    DEF revisar(){
-      SI(REVISAR(colorVacio,12) == VERDADERO){
-        SOLTAR();
-        
-      }SINO{
-        ALARMA(alerta);
-	regresarProducto();
-       
-      }
-    }//revisar
+DEF tomarHay(){
+     SI(REVISAR(#70FF00,12)==FALSO){
+      TOMAR();
+      IMPR('C',LCD);
+      estado[x]='Lleno' ;
+   }SINO{
+      IMPR('',LCD);
+      ALARMA(alarm);
+      estado[x]='Vacío' ;
+      PRENDER();
+      CAJA(1.1);
+   }
 
     DEF regresarProducto(){
       ATRAS(3,1);
@@ -23,9 +24,18 @@ CLASE principal{
     }//rergesarProducto
  
 DEF principal(){
-  revisar();
-  regresarProducto();
-}
+   recorridoZucaritas();
+   tomarHay();  
+   x+=1;
+   recorridoPan();
+   tomarHay();  
+   x+=1;
+   recorridoCanelitas();
+   tomarHay();  
+   //IMPRVECTOR(buscados,3); 
+   //IMPRVECTOR(estado,3); 
+   IMPR(fin,CONSOL); 
+ }
 
     
 }//CLASE

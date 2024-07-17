@@ -1971,7 +1971,7 @@ public class Compilador extends javax.swing.JFrame {
         for (int x=0; x<codigoDiv.size();x++) {
             String bloquesCod = codigoDiv.get(x);
             //System.out.println((si++) + "-" + bloquesCod + "\n");
-            String[] sentencias = bloquesCod.split(";");
+            String[] sentencias = bloquesCod.split(";"); //---¿Esto lo que hace es separarlos cuando terminan en ;?
             for (var sentencia : sentencias) {
                 //aqui vamos a poner los posibles casos
                 sentencia = sentencia.trim(); //quitar los espacios al inicio y al final pq luego no lo detecta
@@ -2221,7 +2221,20 @@ public class Compilador extends javax.swing.JFrame {
                     }else{
                         cuidameloTantito+="   MACRO_LIMPIAR \n";
                     }
+                }else if(sentencia.startsWith("APAGAR")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_APAGAR \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_APAGAR \n";
+                    }
+                }else if(sentencia.startsWith("CAJA")){
+                    if(control==1){
+                        codigoIntermedio+="   MACRO_CAJA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                    }else{
+                        cuidameloTantito+="   MACRO_CAJA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                    }
                 }
+                
                 
             }//For de las sentencias
             //codigoIntermedio+="\n";
