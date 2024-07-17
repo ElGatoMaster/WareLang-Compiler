@@ -1,36 +1,31 @@
-CLASE programaB{
-   CONF CAD pan = 'Wrexler';
-   CONF COLOR colorPan = #000000;
-   CONF FREC a = 1000;
-   
-DEF recorrido(){
-   MIENTRAS(VERADELANTE()==VERDADERO){
-      ADELANTE(4,2);
-   }
-   SI(VERIZQUIERDA()==VERDADERO){
-      IZQUIERDA(3,1);
-   }
-   SI(VERATRAS()==VERDADERO){
-      ATRAS(4,2);
-      
-   }
-}
+CLASE principal{
 
-DEF recgreso(){
-   MIENTRAS(VERATRAS()==VERDADERO){
-      ATRAS(1,2);
-   }
-   SI(VERDERECHA()==VERDADERO){
-      DERECHA(3,1);
-   }
-}
+    CONF FREC alerta = 20;
+    CONF COLOR colorVacio = #70FF00; 
+    CONF CAD producto = 'Zucaritas';
 
+    
+    DEF revisar(){
+      SI(REVISAR(colorVacio,12) == VERDADERO){
+        SOLTAR();
+        
+      }SINO{
+        ALARMA(alerta);
+	regresarProducto();
+       
+      }
+    }//revisar
+
+    DEF regresarProducto(){
+      ATRAS(3,1);
+      IZQUIERDA(1,1);
+      ATRAS(1,1);
+    }//rergesarProducto
+ 
 DEF principal(){
-   recorrido();
-   SI(REVISAR(colorPan,125)==VERDADERO){
-      ALARMA(a);
-   }
-   regreso();
+  revisar();
+  regresarProducto();
 }
 
+    
 }//CLASE
