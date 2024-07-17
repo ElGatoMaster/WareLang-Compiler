@@ -23,14 +23,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java_cup.production;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.Timer;
-import javax.swing.table.DefaultTableModel;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -76,10 +72,11 @@ public class Compilador extends javax.swing.JFrame {
     
     private ArrayList<Production> asignVec;
     private ArrayList<Production> expRel;
-   
+    
     //Codigo intermedio
     String codigoIntermedio;
     String cuidameloTantito;
+    private codigoIntermedio pantallaCodIn;
 
     /**
      * Creates new form Compilador
@@ -99,6 +96,7 @@ public class Compilador extends javax.swing.JFrame {
         tabla = new tablaSimbolosIdent(this, true);
         tablaV = new tablaListas(this, true);
         tablaT = new tablaTokens(this, true);
+        pantallaCodIn = new codigoIntermedio(this,true);
 
         setTitle(titulo);
         directorio = new Directory(this, areaCodigo, titulo, ".ware");
@@ -575,8 +573,11 @@ public class Compilador extends javax.swing.JFrame {
                     "Error en la generacion de codigo", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        System.out.println("Primero \n"+codigoIntermedio);
-        System.out.println("Segundo \n"+cuidameloTantito);
+        System.out.println("\n"+codigoIntermedio);
+        System.out.println("FIN \n"+cuidameloTantito);
+        codigoIntermedio+=" \n"+cuidameloTantito;
+        pantallaCodIn.setCodigo(codigoIntermedio);
+        pantallaCodIn.setVisible(true);
     }//GEN-LAST:event_btnCodIntActionPerformed
 
     private void compile() {
@@ -1888,7 +1889,7 @@ public class Compilador extends javax.swing.JFrame {
         }//Errores en expresion logica
         
         
-        
+        int pri =0;
          // -------------------------- ERROR SEMANTICO PARA NOMBRES DE METODOS REPETIDOS
         for(Production Metodos: DefinirMetodos){ 
 
@@ -1900,19 +1901,28 @@ public class Compilador extends javax.swing.JFrame {
                 }
                 
                 boolean c = true;
+                
                 for (var Met:metodosDeclarados) {
                     if (Met[0].equals(NombreMetodo) ) {
                         errores.add(new ErrorLSSL(61, "Error Semantico {} en la linea #, el nombre de este método ya existe.", Metodos, true));
                         c = false;
                         break;
                     }
-                    
                 }
                 if(c){
                     metodosDeclarados.add(new String[]{NombreMetodo});
                 }
+                
             } //error nombres metodos repetidos
         
+        for(var m: metodosDeclarados){
+            if (m[0].equalsIgnoreCase("principal")) {
+                pri++;
+            }
+        }
+        if (pri == 0) {
+            errores.add(new ErrorLSSL(61, "Error Semantico {} en la linea #, no existe el método 'principal'.",DefinirMetodos.get(DefinirMetodos.size()-1),true));
+        }
         
         
         //------------------- ERROR SEMÁNTICO 3: La condición de repitr no es número entero ---------
@@ -1954,7 +1964,7 @@ public class Compilador extends javax.swing.JFrame {
     //Para controlar donde van las sentencias, o dentro de q nivel, propongo usar la variable control, posibles valores 1 y 2
     private void generarCodigoIntermedio(ArrayList<String> codigoDiv, int control){
         //Aqui vamos a generar el codigo intermedio
-        int temp = 0;int si=0;
+        int temp = 0;
         //codigoDiv tiene todas sentencias contenidas por los bloques de codigo delimitados por { y }
         //bloquesCod representa cada uno de esos bloques de codigo, que puede tener mas de una
         // sentencia, ya sean declaraciones, metodos de movimiento o estructuras de control
@@ -1970,76 +1980,85 @@ public class Compilador extends javax.swing.JFrame {
                 } else if (sentencia.startsWith("CONF")) {
                     String s[] = sentencia.split(" "); //conf td id *opas* *val*
                     if (s.length > 3) {
-                        codigoIntermedio += s[2] + " = " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
+                        codigoIntermedio += "   "+s[2] + " = " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
                     } else {
                         switch (s[1]) {
                             case "CAD" -> {
-                                codigoIntermedio += s[2] + " = '' \n";
+                                codigoIntermedio += "   "+s[2] + " = '' \n";
                             }
                             case "FREC" -> {
-                                codigoIntermedio += s[2] + " = 20 \n";
+                                codigoIntermedio += "   "+s[2] + " = 20 \n";
                             }
                             case "BOOL" -> {
-                                codigoIntermedio += s[2] + " = V \n";
+                                codigoIntermedio += "   "+s[2] + " = V \n";
                             }
                             case "COLOR" -> {
-                                codigoIntermedio += s[2] + " = #000000 \n";
+                                codigoIntermedio += "   "+s[2] + " = #000000 \n";
                             }
                             default -> {
-                                codigoIntermedio += s[2] + " = " + 0 + "\n";
+                                codigoIntermedio += "   "+s[2] + " = " + 0 + "\n";
                             }
                         }
                     }
                 } else if (sentencia.startsWith("VECT")) {
                     String s[]=sentencia.split(" ");//vect td id [ v ] || vect td id = [ * ]
                     if(s[3].equals("=")){
-                        codigoIntermedio+=s[2]+" = "+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()-1)+"] \n";
+                        codigoIntermedio+="   "+s[2]+" = "+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()-1)+"] \n";
                     }else{
                         int t = Integer.parseInt(s[4]);
                         String l ="";
                         for(int i = 0; i < t; i++) {
                             l+=" 0 ,";
                         }
-                        codigoIntermedio+=s[2]+" = ["+ l.substring(0, l.lastIndexOf(","))+"] \n";
+                        codigoIntermedio+="   "+s[2]+" = ["+ l.substring(0, l.lastIndexOf(","))+"] \n";
                     }
                     //codigoIntermedio += "Declaracion de vector \n";
                     
                 } else if (sentencia.startsWith("DEF")) {
                     String s[] = sentencia.split(" ");
                     if (s[1].equals("principal")) {
-                        codigoIntermedio += "PRINCIPAL: \n";
+                        codigoIntermedio += "\nPRINCIPAL: \n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 1);
                         x=pos[1];
+                        codigoIntermedio += "FIN \n";
                         break;
                     } else {
-                        cuidameloTantito += "PROC "+s[1].toUpperCase()+": \n";
+                        cuidameloTantito += "PROC "+s[1]+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 2);
                         x=pos[1];
+                        cuidameloTantito += "FIN PROC\n\n";
                         break;
-                        //codigoIntermedio += "Definicion de metodo \n";
                     }
 
                 } else if (sentencia.split(" ")[0].matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")) { //.matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")
                     if (sentencia.endsWith(")")) {
                         
                         if(control==1){
-                            codigoIntermedio += "Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
+                            codigoIntermedio += "   Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
                         }else{
-                            cuidameloTantito+="Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
+                            cuidameloTantito += "   Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
                         }
-                        
+                        //ASIGNACION
                     } else {
-                        //codigoIntermedio += "Asignacion a variable \n";
-                        String local = "Asignacion a variable \n";
+                        //id [ v ] = val 
+                        String local = "";
                         String t[] = sentencia.split(" ");
                         if (t[1].startsWith("=")) {
-                            local += t[0] + " = " + t[t.length - 1] + " \n";
+                            local += "   "+t[0] + " = " + t[t.length - 1] + " \n";
                         } else if (t[1].startsWith("+") || t[1].startsWith("-")) {
                             temp++;
-                            local += "T" + temp + " = " + t[0] + t[1].charAt(0) + t[t.length - 1] + " \n";
-                            local += t[0] + " = " + "T" + temp + " \n";
+                            local += "   T" + temp + " = " + t[0] + t[1].charAt(0) + t[t.length - 1] + " \n";
+                            local += "   "+t[0] + " = " + "T" + temp + " \n";
+                        }else if(t[2].matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")){
+                            temp++;
+                            local+="    T"+temp+" = "+t[2]+"\n";
+                            local+="    "+t[0]+"[T"+temp+"]"+" = "+sentencia.substring(sentencia.indexOf("=")+1, sentencia.length())+"\n";
+                        }else{
+                            temp++;
+                            local+="    T"+temp+" = "+t[2]+"\n";
+                            local+="    "+t[0]+"[T"+temp+"]"+" = "+sentencia.substring(sentencia.indexOf("=")+1, sentencia.length())+"\n";
                         }
                         if(control==1){
                             codigoIntermedio+=local;
@@ -2048,48 +2067,74 @@ public class Compilador extends javax.swing.JFrame {
                         }
                     }
                 } else if (sentencia.startsWith("SI") || sentencia.startsWith("SINO")) {
-                    String local="LBL"+(cLBL)+":\n";cLBL++;
+                    String local="LBL"+(cLBL++)+":\n";
                     if(sentencia.startsWith("SI ")){
-                        local+="if "+sentencia.substring(sentencia.indexOf(" ("),sentencia.lastIndexOf(" )"))
-                                +" goto LBL"+(cLBL+1)+"\n";
+                        local+="    if "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))
+                                +" goto LBL"+(cLBL)+"\n"+
+                                "   goto LBL"+(cLBL+1)+"\n";
                     }else{//si la palabra es SINO
-                        local="";
+                        local=" goto LBL"+(cLBL+1)+"\n";
                     }
                     if(control==1){
-                        codigoIntermedio += local +"LBL"+cLBL+":\n";
+                        codigoIntermedio += local +"LBL"+(cLBL)+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
+                        if(sentencia.startsWith("SINO"))
+                            codigoIntermedio+="LBL"+(++cLBL)+": \n";
+                        //codigoIntermedio+="\n";
                         break;
                     }else{
-                        cuidameloTantito += local +"LBL"+cLBL+":\n";
+                        cuidameloTantito += local +"LBL"+(cLBL)+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
+                        if(sentencia.startsWith("SINO"))
+                            cuidameloTantito+="LBL"+(++cLBL)+": \n";
+                        
                         break;
                     }
                     
                 } else if (sentencia.startsWith("MIENTRAS")) {
+                    int sp;
                     if(control==1){
-                        codigoIntermedio += "Sentencia MIENTRAS \n";
+                        codigoIntermedio+="LBL"+cLBL+": \n";sp=cLBL;
+                        codigoIntermedio+=" if "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))
+                                +" goto LBL"+(++cLBL)+"\n"+
+                                "   goto LBL"+(cLBL+1)+"\n"+"LBL"+cLBL+":\n";
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
+                        x=pos[1];
+                        codigoIntermedio+=" goto LBL"+sp+"\n"+"LBL"+(++cLBL)+":\n";;
+                        break;
                     }else{
-                        cuidameloTantito += "Sentencia MIENTRAS \n";
+                        cuidameloTantito+="LBL"+cLBL+":\n";sp=cLBL;
+                        cuidameloTantito+=" if "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))
+                                +" goto LBL"+(++cLBL)+"\n"+
+                                "   goto LBL"+(cLBL+1)+"\n"+"LBL"+cLBL+":\n";
+                        int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
+                        generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
+                        x=pos[1];
+                        cuidameloTantito+=" goto LBL"+sp+"\n"+"LBL"+(++cLBL)+":\n";
+                        break;
                     }
                     
                 } else if (sentencia.startsWith("REPETIR")) {
                     if(control==1){
-                        codigoIntermedio +="\nLBL "+cLBL+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";cLBL++;int spt=cLBL;
+                        codigoIntermedio +="LBL"+(++cLBL)+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                        cLBL++;int spt=cLBL;
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        codigoIntermedio+="LOOP LBL"+spt+"\n\n";cLBL++;
+                        codigoIntermedio+=" LOOP LBL"+spt+"\n";cLBL++;
                         break;
                     }else{
-                        cuidameloTantito += "\nLBL "+cLBL+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";cLBL++;int spt=cLBL;
+                        cuidameloTantito += "LBL "+(++cLBL)+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                        cLBL++;int spt=cLBL;
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        cuidameloTantito+="LOOP LBL"+spt+"\n\n";cLBL++;
+                        cuidameloTantito+=" LOOP LBL"+spt+"\n";cLBL++;
                         break;
                     }
                 } else if (sentencia.startsWith("ADELANTE")) {
@@ -2309,6 +2354,10 @@ public class Compilador extends javax.swing.JFrame {
         asignVec.clear();
         expRel.clear(); 
         funcRepetir.clear();
+        
+        cLBL=1;
+        codigoIntermedio="";
+        cuidameloTantito="";
     }
 
     private void appendToPane(JTextPane tp, String msg, Color c) {

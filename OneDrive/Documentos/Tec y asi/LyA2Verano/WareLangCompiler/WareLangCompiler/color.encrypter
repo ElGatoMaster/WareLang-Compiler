@@ -1,81 +1,36 @@
-CLASE busqueda{
-//DECLARACION DE VARIABLES
-CONF COLOR colorVacio = #70FF00;
-CONF CAD fin = 'Finalización de la revision';
-CONF CAD cajaVacia = 'Caja vacia';
-CONF CAD cajaLlena = 'Producto tomado';
-CONF FREC alarm = 20;
-CONF MINI x = 0;
-VECT CAD buscados = ['Zucaritas','Pan Bimbo','Canelitas'];
-VECT CAD estado [3];
-
-
-DEF tomarHay(){
-     SI(REVISAR(#70FF00,12)==FALSO){
-      TOMAR();
-      IMPR('C',LCD);
-      estado[x]='Lleno' ;
-   }SINO{
-      IMPR('',LCD);
-      ALARMA(alarm);
-      estado[x]='Vacío' ;
+CLASE programaB{
+   CONF CAD pan = 'Wrexler';
+   CONF COLOR colorPan = #000000;
+   CONF FREC a = 1000;
+   
+DEF recorrido(){
+   MIENTRAS(VERADELANTE()==VERDADERO){
+      ADELANTE(4,2);
    }
-
+   SI(VERIZQUIERDA()==VERDADERO){
+      IZQUIERDA(3,1);
+   }
+   SI(VERATRAS()==VERDADERO){
+      ATRAS(4,2);
+      
+   }
 }
 
-
-//DECLARACION METODOS
-DEF recorridoZucaritas(){
-REPETIR(3){
-   SI(VERADELANTE()==VERDADERO){
-      ADELANTE(1,2);
-   }SINO{
-      PARAR();
-      IMPR('obstruccion',LCD);
-
-   }
- }
-
-}
-
-DEF recorridoPan(){
- REPETIR(2){
-   SI(VERDERECHA()==VERDADERO){
-      DERECHA(1,2);
-   }SINO{
-      PARAR();
-      IMPR('obstruccion',LCD);
-
-   }
- }
-
-}
-
-DEF recorridoCanelitas(){
- REPETIR(4){
-   SI(VERDERECHA()==VERDADERO){
+DEF recgreso(){
+   MIENTRAS(VERATRAS()==VERDADERO){
       ATRAS(1,2);
-   }SINO{
-      PARAR();
-      IMPR('obstruccion',LCD);
-
    }
- }
-
+   SI(VERDERECHA()==VERDADERO){
+      DERECHA(3,1);
+   }
 }
 
 DEF principal(){
-   recorridoZucaritas();
-   tomarHay();  
-   x+=1;
-   recorridoPan();
-   tomarHay();  
-   x+=1;
-   recorridoCanelitas();
-   tomarHay();  
-   IMPRVECTOR(buscados,3); 
-   IMPRVECTOR(estado,3); 
-   IMPR(fin,CONSOL); 
- }
-
+   recorrido();
+   SI(REVISAR(colorPan,125)==VERDADERO){
+      ALARMA(a);
+   }
+   regreso();
 }
+
+}//CLASE
