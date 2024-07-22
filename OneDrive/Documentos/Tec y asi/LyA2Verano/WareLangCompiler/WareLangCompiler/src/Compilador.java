@@ -1,4 +1,3 @@
-
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import compilerTools.CodeBlock;
@@ -23,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
@@ -76,6 +76,8 @@ public class Compilador extends javax.swing.JFrame {
     //Codigo intermedio
     String codigoIntermedio;
     String cuidameloTantito;
+    //PARA el ASM
+    String data,code,proc;
     private codigoIntermedio pantallaCodIn;
 
     /**
@@ -84,7 +86,7 @@ public class Compilador extends javax.swing.JFrame {
     public Compilador() {
         initComponents();
         init();
-        for (int i = 0; i < 80 * 300; i++) // Default Height of cmd is 300 and Default width is 80
+        for (int i = 0; i < 24000; i++) // Default Height of cmd is 300 and Default width is 80
         {
             System.out.println("\b"); // Prints a backspace
         }
@@ -141,19 +143,20 @@ public class Compilador extends javax.swing.JFrame {
         FuncionImprimirVec = new ArrayList<>();
         DefinirMetodos = new ArrayList<>();
         expRel = new ArrayList<>();
-
         decVecVal = new ArrayList<>();
         asignVec = new ArrayList<>();
-        
         funcRepetir = new ArrayList<>();
-        
         errores = new ArrayList();
         textocolor = new ArrayList<>();
         
         //Generar codigo intermedio
         codigoIntermedio = "";
         cuidameloTantito = "";
-
+        //Generar el asm
+        data="";
+        code="";
+        proc="";
+        
         estadoCompilacion = true;
         //tablaSimbolos.setVisible(false);
     }
@@ -400,6 +403,8 @@ public class Compilador extends javax.swing.JFrame {
             }
         });
 
+        btnCodInt.setBackground(new java.awt.Color(153, 51, 0));
+        btnCodInt.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnCodInt.setText("CI");
         btnCodInt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -422,8 +427,8 @@ public class Compilador extends javax.swing.JFrame {
                 .addComponent(btnGuardarC, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnCompilar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 51, Short.MAX_VALUE)
                 .addGap(18, 18, 18))
         );
         jPanel3Layout.setVerticalGroup(
@@ -435,7 +440,7 @@ public class Compilador extends javax.swing.JFrame {
                     .addComponent(btnGuardar)
                     .addComponent(btnGuardarC)
                     .addComponent(btnCompilar)
-                    .addComponent(btnCodInt))
+                    .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -511,7 +516,7 @@ public class Compilador extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         pack();
@@ -564,19 +569,10 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void btnCodIntActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCodIntActionPerformed
-        //Se genera el codigo intermedio aqui en caliente.
-        if(estadoCompilacion && errores.isEmpty()){
-            ArrayList<String> codigoDividido = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";").getBlocksOfCodeInOrderOfExec();
-            generarCodigoIntermedio(codigoDividido,1);
-        }else{
-            JOptionPane.showMessageDialog(null, "No se puede generar el codigo intermedio porque el programa contiene errores...",
-                    "Error en la generacion de codigo", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        System.out.println("\n"+codigoIntermedio);
-        System.out.println("FIN \n"+cuidameloTantito);
         codigoIntermedio+=" \n"+cuidameloTantito;
+        data+=code+proc;
         pantallaCodIn.setCodigo(codigoIntermedio);
+        pantallaCodIn.setEnsamblador(data);
         pantallaCodIn.setVisible(true);
     }//GEN-LAST:event_btnCodIntActionPerformed
 
@@ -588,8 +584,22 @@ public class Compilador extends javax.swing.JFrame {
         TablaTokens();
         tablasSimbolos();
         imprimirConsola();
-
+        
         estadoCompilacion = true;
+
+        //Se genera el codigo intermedio aqui en caliente.
+        if(estadoCompilacion && errores.isEmpty()){
+            ArrayList<String> codigoDividido = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";").getBlocksOfCodeInOrderOfExec();
+            generarCodigoIntermedio(codigoDividido,1);
+        }else{
+            JOptionPane.showMessageDialog(null, "No se puede generar el codigo intermedio porque el programa contiene errores...",
+                    "Error en la generacion de codigo", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        //System.out.println("\n"+codigoIntermedio);
+        //System.out.println("\n"+cuidameloTantito);
+
+        
         jButton1.setEnabled(estadoCompilacion);
     }
 
@@ -1607,7 +1617,7 @@ public class Compilador extends javax.swing.JFrame {
           
            //******************** MÉTODO IMPRIMIR *******************
         
-       ArrayList<String> ImprimirOP = new ArrayList<>();
+        ArrayList<String> ImprimirOP = new ArrayList<>();
         ImprimirOP.add("LCD");
         ImprimirOP.add("CONSOL");
     
@@ -1977,26 +1987,37 @@ public class Compilador extends javax.swing.JFrame {
                 sentencia = sentencia.trim(); //quitar los espacios al inicio y al final pq luego no lo detecta
                 if (sentencia.startsWith("CLASE")) {
                     codigoIntermedio += "INICIO: \n";
+                    data+=".model small\n.stack\n.data\n";
                 } else if (sentencia.startsWith("CONF")) {
                     String s[] = sentencia.split(" "); //conf td id *opas* *val*
-                    if (s.length > 3) {
+                    if (s.length > 3 ) {
                         codigoIntermedio += "   "+s[2] + " = " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
+                        switch (s[1]) {
+                            case "BOOL" -> data+="   "+s[2] + " dw '" + s[4].charAt(0) + "'\n";
+                            case "COLOR" -> data+="   "+s[2] + " dw '"+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length())+"'\n";
+                            default -> data+="   "+s[2] + " dw " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
+                        }
                     } else {
                         switch (s[1]) {
                             case "CAD" -> {
                                 codigoIntermedio += "   "+s[2] + " = '' \n";
+                                data += "   "+s[2] + " dw '' \n";
                             }
                             case "FREC" -> {
                                 codigoIntermedio += "   "+s[2] + " = 20 \n";
+                                data += "   "+s[2] + " dw 20 \n";
                             }
                             case "BOOL" -> {
                                 codigoIntermedio += "   "+s[2] + " = V \n";
+                                data += "   "+s[2] + " dw 'V' \n";
                             }
                             case "COLOR" -> {
                                 codigoIntermedio += "   "+s[2] + " = #000000 \n";
+                                data += "   "+s[2] + " dw '#000000' \n";
                             }
                             default -> {
                                 codigoIntermedio += "   "+s[2] + " = " + 0 + "\n";
+                                data += "   "+s[2] + " dw " + 0 + "\n";
                             }
                         }
                     }
@@ -2004,6 +2025,7 @@ public class Compilador extends javax.swing.JFrame {
                     String s[]=sentencia.split(" ");//vect td id [ v ] || vect td id = [ * ]
                     if(s[3].equals("=")){
                         codigoIntermedio+="   "+s[2]+" = "+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()-1)+"] \n";
+                        data+="   "+s[2]+" dw "+sentencia.substring(sentencia.indexOf(s[4])+1,sentencia.length()-2)+"] \n";
                     }else{
                         int t = Integer.parseInt(s[4]);
                         String l ="";
@@ -2011,6 +2033,7 @@ public class Compilador extends javax.swing.JFrame {
                             l+=" 0 ,";
                         }
                         codigoIntermedio+="   "+s[2]+" = ["+ l.substring(0, l.lastIndexOf(","))+"] \n";
+                        data+="   "+s[2]+" dw "+ l.substring(0, l.lastIndexOf(","))+" \n";
                     }
                     //codigoIntermedio += "Declaracion de vector \n";
                     
@@ -2018,17 +2041,27 @@ public class Compilador extends javax.swing.JFrame {
                     String s[] = sentencia.split(" ");
                     if (s[1].equals("principal")) {
                         codigoIntermedio += "\nPRINCIPAL: \n";
+                        code+=".code\n" +
+                                "   mov ax,@data\n" +
+                                "   mov ds,ax\n" +
+                                "   mov es,ax\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 1);
                         x=pos[1];
                         codigoIntermedio += "FIN \n";
+                        code+="FIN:\n" + 
+                                "   mov ax,4c00h\n" +
+                                "   int 21h\n\n";
                         break;
                     } else {
                         cuidameloTantito += "PROC "+s[1]+":\n";
+                        proc+="PROC "+s[1]+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 2);
                         x=pos[1];
                         cuidameloTantito += "FIN PROC\n\n";
+                        proc+="   RET\n"
+                            +"ENDP \n\n";
                         break;
                     }
 
@@ -2037,61 +2070,140 @@ public class Compilador extends javax.swing.JFrame {
                         
                         if(control==1){
                             codigoIntermedio += "   Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
+                            code+="   CALL "+sentencia.substring(0, sentencia.length()-3)+" \n";
                         }else{
                             cuidameloTantito += "   Call "+sentencia.substring(0, sentencia.length()-3)+" \n";
+                            proc+="   CALL "+sentencia.substring(0, sentencia.length()-3)+" \n";
                         }
                         //ASIGNACION
                     } else {
                         //id [ v ] = val 
-                        String local = "";
+                        String local = "";String s2="";
                         String t[] = sentencia.split(" ");
                         if (t[1].startsWith("=")) {
                             local += "   "+t[0] + " = " + t[t.length - 1] + " \n";
+                            s2+="   MOV "+t[0]+", "+sentencia.substring(sentencia.indexOf(t[2]), sentencia.length())+"\n";
                         } else if (t[1].startsWith("+") || t[1].startsWith("-")) {
                             temp++;
                             local += "   T" + temp + " = " + t[0] + t[1].charAt(0) + t[t.length - 1] + " \n";
                             local += "   "+t[0] + " = " + "T" + temp + " \n";
+                            if(t[1].startsWith("+")){
+                                s2+="   MOV AX, "+t[0]+"\n"+
+                                    "   MOV BX, "+t[t.length - 1]+"\n"+
+                                    "   ADD AX, BX\n"+
+                                    "   MOV "+t[0]+", AX \n";
+                            }else{
+                                s2+="   MOV AX, "+t[0]+"\n"+
+                                    "   MOV BX, "+t[t.length - 1]+"\n"+
+                                    "   SUB AX, BX\n"+
+                                    "   MOV "+t[0]+", AX \n";
+                            }
                         }else if(t[2].matches("[a-zñ]([A-Za-zÑñ]|[0-9]){0,29}")){
                             temp++;
                             local+="    T"+temp+" = "+t[2]+"\n";
                             local+="    "+t[0]+"[T"+temp+"]"+" = "+sentencia.substring(sentencia.indexOf("=")+1, sentencia.length())+"\n";
+                            s2+="   MOV SI, "+t[2]+"\n";
+                            s2+="   MOV "+t[0]+"[SI], "+sentencia.substring(sentencia.indexOf("=")+1, sentencia.length())+"\n";
                         }else{
                             temp++;
                             local+="    T"+temp+" = "+t[2]+"\n";
                             local+="    "+t[0]+"[T"+temp+"]"+" = "+sentencia.substring(sentencia.indexOf("=")+1, sentencia.length())+"\n";
+                            s2+="   MOV SI, "+t[2]+"\n";
+                            s2+="   MOV "+t[0]+"[SI], "+sentencia.substring(sentencia.indexOf("=")+1, sentencia.length())+"\n";
                         }
                         if(control==1){
                             codigoIntermedio+=local;
+                            code+=s2;
                         }else{
                             cuidameloTantito+=local;
+                            proc+=s2;
                         }
                     }
                 } else if (sentencia.startsWith("SI") || sentencia.startsWith("SINO")) {
                     String local="LBL"+(cLBL++)+":\n";
+                    String emu="LBL"+(cLBL-1)+":\n";
                     if(sentencia.startsWith("SI ")){
                         local+="    if "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))
                                 +" goto LBL"+(cLBL)+"\n"+
                                 "   goto LBL"+(cLBL+1)+"\n";
+                        String s[] = sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
+                        System.out.println(Arrays.toString(s));
+                        if(s[0].equals("REVISAR")){//REVUISAr ( 1 , 2 ) op valor
+                            emu+="   MACRO_REVISAR "+s[2]+s[3]+s[4]+"\n";
+                            emu+="   MOV BX, '"+s[s.length-1].charAt(0)+"' \n";
+                            emu+="   CMP AX,BX\n";
+                            emu+="   JE LBL"+(cLBL)+"\n";
+                            emu+="   JMP LBL"+(cLBL+1)+"\n";
+                        }else if(s[0].startsWith("VER")){
+                            emu+="   MACRO_"+s[0]+"\n";
+                            emu+="   MOV BX, '"+s[s.length-1].charAt(0)+"' \n";
+                            emu+="   CMP AX,BX\n";
+                            emu+="   JE LBL"+(cLBL)+"\n";
+                            emu+="   JMP LBL"+(cLBL+1)+"\n";
+                        }else{
+                            emu+="   MOV AX, "+s[0]+"\n";
+                            if(s[s.length-1].equals("VERDAERO") || s[s.length-1].equals("FALSO"))
+                                emu+="   MOV BX, "+s[s.length-1].charAt(0)+"\n";
+                            else
+                                emu+="   MOV BX, "+s[s.length-1]+"\n";
+                            emu+="   CMP AX,BX \n";
+                            switch (s[1]) {
+                                case "==" -> {
+                                    emu+="   JE LBL"+(cLBL)+"\n";
+                                    emu+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case "!=" -> {
+                                    emu+="   JNE LBL"+(cLBL)+"\n";
+                                    emu+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case "<" -> {
+                                    emu+="   JB LBL"+(cLBL)+"\n";
+                                    emu+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case ">" -> {
+                                    emu+="   JG LBL"+(cLBL)+"\n";
+                                    emu+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case "<=" -> {
+                                    emu+="   JBE LBL"+(cLBL)+"\n";
+                                    emu+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case ">=" -> {
+                                    emu+="   JGE LBL"+(cLBL)+"\n";
+                                    emu+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                default ->{
+                                    emu+="   JMP LBL"+(cLBL)+"\n";
+                                    emu+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                            }
+                        }
                     }else{//si la palabra es SINO
                         local=" goto LBL"+(cLBL+1)+"\n";
+                        emu="   JMP LBL"+(cLBL+1)+"\n";
                     }
                     if(control==1){
                         codigoIntermedio += local +"LBL"+(cLBL)+":\n";
+                        code+=emu+"LBL"+cLBL+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        if(sentencia.startsWith("SINO"))
+                        if(sentencia.startsWith("SINO")){
                             codigoIntermedio+="LBL"+(++cLBL)+": \n";
+                            code+="LBL"+(cLBL)+":\n";
+                        }
                         //codigoIntermedio+="\n";
                         break;
                     }else{
                         cuidameloTantito += local +"LBL"+(cLBL)+":\n";
+                        proc+=emu+"LBL"+cLBL+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        if(sentencia.startsWith("SINO"))
+                        if(sentencia.startsWith("SINO")){
                             cuidameloTantito+="LBL"+(++cLBL)+": \n";
-                        
+                            proc+="LBL"+cLBL+":\n";
+                        }
                         break;
                     }
                     
@@ -2105,7 +2217,7 @@ public class Compilador extends javax.swing.JFrame {
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        codigoIntermedio+=" goto LBL"+sp+"\n"+"LBL"+(++cLBL)+":\n";;
+                        codigoIntermedio+=" goto LBL"+sp+"\n"+"LBL"+(++cLBL)+":\n";
                         break;
                     }else{
                         cuidameloTantito+="LBL"+cLBL+":\n";sp=cLBL;
@@ -2371,6 +2483,10 @@ public class Compilador extends javax.swing.JFrame {
         cLBL=1;
         codigoIntermedio="";
         cuidameloTantito="";
+        //asm
+        data="";
+        code="";
+        proc="";
     }
 
     private void appendToPane(JTextPane tp, String msg, Color c) {
