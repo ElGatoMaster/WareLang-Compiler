@@ -11,14 +11,17 @@ import compilerTools.Production;
 import compilerTools.TextColor;
 import compilerTools.Token;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -157,7 +160,7 @@ public class Compilador extends javax.swing.JFrame {
         code="";
         proc="";
         
-        estadoCompilacion = true;
+        estadoCompilacion = false;
         //tablaSimbolos.setVisible(false);
     }
 
@@ -195,6 +198,7 @@ public class Compilador extends javax.swing.JFrame {
         btnGuardarC = new javax.swing.JButton();
         btnCompilar = new javax.swing.JButton();
         btnCodInt = new javax.swing.JButton();
+        btnEjecutar = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -242,7 +246,7 @@ public class Compilador extends javax.swing.JFrame {
             .addGroup(panelButtonCompilerExecuteLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton2)
@@ -412,6 +416,13 @@ public class Compilador extends javax.swing.JFrame {
             }
         });
 
+        btnEjecutar.setText("EXE");
+        btnEjecutar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEjecutarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -428,8 +439,10 @@ public class Compilador extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnCompilar)
                 .addGap(18, 18, 18)
-                .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 51, Short.MAX_VALUE)
-                .addGap(18, 18, 18))
+                .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -440,7 +453,8 @@ public class Compilador extends javax.swing.JFrame {
                     .addComponent(btnGuardar)
                     .addComponent(btnGuardarC)
                     .addComponent(btnCompilar)
-                    .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnCodInt, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -490,8 +504,8 @@ public class Compilador extends javax.swing.JFrame {
                             .addComponent(jScrollPane1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(panelButtonCompilerExecute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(panelButtonCompilerExecute, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(jScrollPane2))
                         .addContainerGap())
@@ -516,7 +530,7 @@ public class Compilador extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(9, Short.MAX_VALUE))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
 
         pack();
@@ -569,12 +583,28 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void btnCodIntActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCodIntActionPerformed
-        codigoIntermedio+=" \n"+cuidameloTantito;
-        data+=code+proc;
-        pantallaCodIn.setCodigo(codigoIntermedio);
-        pantallaCodIn.setEnsamblador(data);
-        pantallaCodIn.setVisible(true);
+        if(estadoCompilacion){
+           pantallaCodIn.setVisible(true); 
+        }else{
+            JOptionPane.showMessageDialog(null, "No se ha compilado el programa, no se puede mostrar esto...",
+                    "Error en la generacion de codigo", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }//GEN-LAST:event_btnCodIntActionPerformed
+
+    private void btnEjecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEjecutarActionPerformed
+        //Para ejecutar la CHINGADERA
+        String tit = this.getTitle();
+        tit = tit.substring(0, tit.indexOf("."));
+        String rutaASM = "C:\\Users\\yvano\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\"+tit +".asm";
+        File file = new File(rutaASM);
+        Desktop d = Desktop.getDesktop();
+        try {
+            d.open(file);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }//GEN-LAST:event_btnEjecutarActionPerformed
 
     private void compile() {
         limpiarAreaCodigo();
@@ -588,7 +618,7 @@ public class Compilador extends javax.swing.JFrame {
         estadoCompilacion = true;
 
         //Se genera el codigo intermedio aqui en caliente.
-        if(estadoCompilacion && errores.isEmpty()){
+        if(errores.isEmpty()){
             ArrayList<String> codigoDividido = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";").getBlocksOfCodeInOrderOfExec();
             generarCodigoIntermedio(codigoDividido,1);
         }else{
@@ -596,9 +626,12 @@ public class Compilador extends javax.swing.JFrame {
                     "Error en la generacion de codigo", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        //System.out.println("\n"+codigoIntermedio);
-        //System.out.println("\n"+cuidameloTantito);
-
+        codigoIntermedio+=" \n"+cuidameloTantito;
+        data+=code+proc+"END";
+        pantallaCodIn.setCodigo(codigoIntermedio);
+        pantallaCodIn.setEnsamblador(data);
+        
+        averQPedo();
         
         jButton1.setEnabled(estadoCompilacion);
     }
@@ -671,11 +704,7 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("MetodoSP", "F_SOLTAR | APAGAR | PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR ");
         gramatica.group("Metodo", "F_SOLTAR | APAGAR | PRENDER | F_LIMPIAR | F_TOMAR | F_PARAR ");
         
-
-        
-
         //***************************************** VECTORES *******************************
-        
         
         gramatica.group("DeclaracionVect", "VECTOR TipoDato Identificador Corch_abr (Numero|Valor) Corch_cer ",decVecVal);
        
@@ -1991,7 +2020,7 @@ public class Compilador extends javax.swing.JFrame {
                 } else if (sentencia.startsWith("CONF")) {
                     String s[] = sentencia.split(" "); //conf td id *opas* *val*
                     if (s.length > 3 ) {
-                        codigoIntermedio += "   "+s[2] + " = " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
+                        //codigoIntermedio += "   "+s[2] + " = " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
                         switch (s[1]) {
                             case "BOOL" -> data+="   "+s[2] + " dw '" + s[4].charAt(0) + "'\n";
                             case "COLOR" -> data+="   "+s[2] + " dw '"+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length())+"'\n";
@@ -2025,7 +2054,7 @@ public class Compilador extends javax.swing.JFrame {
                     String s[]=sentencia.split(" ");//vect td id [ v ] || vect td id = [ * ]
                     if(s[3].equals("=")){
                         codigoIntermedio+="   "+s[2]+" = "+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()-1)+"] \n";
-                        data+="   "+s[2]+" dw "+sentencia.substring(sentencia.indexOf(s[4])+1,sentencia.length()-2)+"] \n";
+                        data+="   "+s[2]+" dw "+sentencia.substring(sentencia.indexOf(s[4])+1,sentencia.length()-2)+" \n";
                     }else{
                         int t = Integer.parseInt(s[4]);
                         String l ="";
@@ -2049,7 +2078,7 @@ public class Compilador extends javax.swing.JFrame {
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 1);
                         x=pos[1];
                         codigoIntermedio += "FIN \n";
-                        code+="FIN:\n" + 
+                        code+="FINZ:\n" + 
                                 "   mov ax,4c00h\n" +
                                 "   int 21h\n\n";
                         break;
@@ -2214,148 +2243,316 @@ public class Compilador extends javax.swing.JFrame {
                         codigoIntermedio+=" if "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))
                                 +" goto LBL"+(++cLBL)+"\n"+
                                 "   goto LBL"+(cLBL+1)+"\n"+"LBL"+cLBL+":\n";
+                        code+="LBL"+sp+": \n";
+                        String[] cmp = sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
+                        System.out.println(Arrays.toString(cmp));
+                        if(cmp[0].equals("REVISAR")){//REVUISAr ( 1 , 2 ) op valor
+                            code+="   MACRO_REVISAR "+cmp[2]+cmp[3]+cmp[4]+"\n";
+                            code+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
+                            code+="   CMP AX,BX\n";
+                            code+="   JE LBL"+(cLBL)+"\n";
+                            code+="   JMP LBL"+(cLBL+1)+"\n";
+                        }else if(cmp[0].startsWith("VER")){
+                            code+="   MACRO_"+cmp[0]+"\n";
+                            code+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
+                            code+="   CMP AX,BX\n";
+                            code+="   JE LBL"+(cLBL)+"\n";
+                            code+="   JMP LBL"+(cLBL+1)+"\n";
+                        }else{
+                            code+="   MOV AX, "+cmp[0]+"\n";
+                            if(cmp[cmp.length-1].equals("VERDAERO") || cmp[cmp.length-1].equals("FALSO"))
+                                code+="   MOV BX, "+cmp[cmp.length-1].charAt(0)+"\n";
+                            else
+                                code+="   MOV BX, "+cmp[cmp.length-1]+"\n";
+                            code+="   CMP AX,BX \n";
+                            switch (cmp[1]) {
+                                case "==" -> {
+                                    code+="   JE LBL"+(cLBL)+"\n";
+                                    code+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case "!=" -> {
+                                    code+="   JNE LBL"+(cLBL)+"\n";
+                                    code+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case "<" -> {
+                                    code+="   JB LBL"+(cLBL)+"\n";
+                                    code+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case ">" -> {
+                                    code+="   JG LBL"+(cLBL)+"\n";
+                                    code+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case "<=" -> {
+                                    code+="   JBE LBL"+(cLBL)+"\n";
+                                    code+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                case ">=" -> {
+                                    code+="   JGE LBL"+(cLBL)+"\n";
+                                    code+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                                default ->{
+                                    code+="   JMP LBL"+(cLBL)+"\n";
+                                    code+="   JMP LBL"+(cLBL+1)+"\n";
+                                }
+                            }
+                        }
+                        code+="LBL"+cLBL+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
                         codigoIntermedio+=" goto LBL"+sp+"\n"+"LBL"+(++cLBL)+":\n";
+                        code+="   JMP LBL"+sp+"\n"+ "LBL"+(cLBL)+":\n";
+                        
                         break;
-                    }else{
+                    }else{//IF DEL CONTROL
                         cuidameloTantito+="LBL"+cLBL+":\n";sp=cLBL;
                         cuidameloTantito+=" if "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))
                                 +" goto LBL"+(++cLBL)+"\n"+
                                 "   goto LBL"+(cLBL+1)+"\n"+"LBL"+cLBL+":\n";
+                        proc+="LBL"+sp+": \n";
+                        String[] cmp = sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
+                        System.out.println(Arrays.toString(cmp));
+                        if(cmp[0].equals("REVISAR")){//REVUISAr ( 1 , 2 ) op valor
+                            proc+="   MACRO_REVISAR "+cmp[2]+cmp[3]+cmp[4]+"\n";
+                            proc+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
+                            proc+="   CMP AX,BX\n";
+                            proc+="   JE LBL"+(cLBL)+"\n";
+                        }else if(cmp[0].startsWith("VER")){
+                            proc+="   MACRO_"+cmp[0]+"\n";
+                            proc+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
+                            proc+="   CMP AX,BX\n";
+                            proc+="   JE LBL"+(cLBL)+"\n";
+                        }else{
+                            proc+="   MOV AX, "+cmp[0]+"\n";
+                            if(cmp[cmp.length-1].equals("VERDAERO") || cmp[cmp.length-1].equals("FALSO"))
+                                proc+="   MOV BX, "+cmp[cmp.length-1].charAt(0)+"\n";
+                            else
+                                proc+="   MOV BX, "+cmp[cmp.length-1]+"\n";
+                            proc+="   CMP AX,BX \n";
+                            switch (cmp[1]) {
+                                case "==" -> {
+                                    proc+="   JE LBL"+(cLBL)+"\n";
+                                }
+                                case "!=" -> {
+                                    proc+="   JNE LBL"+(cLBL)+"\n";
+                                }
+                                case "<" -> {
+                                    proc+="   JB LBL"+(cLBL)+"\n";
+                                }
+                                case ">" -> {
+                                    proc+="   JG LBL"+(cLBL)+"\n";
+                                }
+                                case "<=" -> {
+                                    proc+="   JBE LBL"+(cLBL)+"\n";
+                                }
+                                case ">=" -> {
+                                    proc+="   JGE LBL"+(cLBL)+"\n";
+                                }
+                                default ->{
+                                    proc+="   JMP LBL"+(cLBL)+"\n";
+                                }
+                            }
+                        }
+                        proc+="   JMP LBL"+(cLBL+1)+"\n";
+                        proc+="LBL"+cLBL+":\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
                         cuidameloTantito+=" goto LBL"+sp+"\n"+"LBL"+(++cLBL)+":\n";
+                        proc+=" JMP LBL"+sp+"\n"+"LBL"+cLBL+":\n";
                         break;
                     }
                     
                 } else if (sentencia.startsWith("REPETIR")) {
                     if(control==1){
-                        codigoIntermedio +="LBL"+(++cLBL)+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                        codigoIntermedio+="LBL"+(++cLBL)+":\n ";
+                        codigoIntermedio+=" REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                        code+="  MOV cx, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                        code+="LBL"+cLBL+":\n";
                         cLBL++;int spt=cLBL;
+                        //code+="LBL"+(spt-1)+":\n";
+                        code+="  PUSH cx\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
                         codigoIntermedio+=" LOOP LBL"+spt+"\n";cLBL++;
+                        code+="  POP cx\n";
+                        code+="  LOOP LBL"+(spt-1)+"\n";
                         break;
-                    }else{
-                        cuidameloTantito += "LBL "+(++cLBL)+":\n REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                    }else{//PARA PROCEDIMIENTOS
+                        cuidameloTantito += "LBL "+(++cLBL)+":\n "
+                        + "REPETIR , "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                        proc+="  MOV cx, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+"\n";
+                        proc+="LBL"+cLBL+":\n";
                         cLBL++;int spt=cLBL;
+                        //proc+="LBL"+(spt-1)+":\n";
+                        proc+="  PUSH cx\n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
                         cuidameloTantito+=" LOOP LBL"+spt+"\n";cLBL++;
+                        proc+="  POP cx\n";
+                        proc+="  LOOP LBL"+(spt-1)+"\n";
                         break;
                     }
                 } else if (sentencia.startsWith("ADELANTE")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("ATRAS")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("IZQUIERDA")) {
                     if(control==1){
                         codigoIntermedio +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("DERECHA")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 } else if (sentencia.startsWith("PARAR")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_PARAR\n";
+                        code += "   MACRO_PARAR\n";
                     }else{
                         cuidameloTantito += "   MACRO_PARAR\n";
+                        proc += "   MACRO_PARAR\n";
                     }
                     
                 } else if (sentencia.startsWith("REVISAR")) {
                     if(control==1){
                         codigoIntermedio +="   MACRO_REVISAR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code +="   MACRO_REVISAR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito += "   MACRO_REVISAR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MACRO_REVISAR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                     
                 }else if(sentencia.startsWith("IMPRVECTOR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_IMPR_VECTOR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MACRO_IMPR_VECTOR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito+="   MACRO_IMPR_VECTOR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc+="   MACRO_IMPR_VECTOR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                 }else if(sentencia.startsWith("IMPR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_IMPR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MACRO_IMPR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito+="   MACRO_IMPR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc+="   MACRO_IMPR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                 }else if(sentencia.startsWith("ALARMA")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_ALARMA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MACRO_ALARMA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito+="   MACRO_ALARMA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc+="   MACRO_ALARMA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                 }else if(sentencia.startsWith("PRENDER")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_PRENDER \n";
+                        code+="   MACRO_PRENDER \n";
                     }else{
-                        cuidameloTantito+="   MACRO_PRENDER \n";
+                        proc+="   MACRO_PRENDER \n";
                     }
                 }else if(sentencia.startsWith("PRENDER")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_TOMAR \n";
+                        code+="   MACRO_TOMAR \n";
                     }else{
                         cuidameloTantito+="   MACRO_TOMAR  \n";
+                        proc+="   MACRO_TOMAR  \n";
                     }
                 }else if(sentencia.startsWith("SOLTAR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_SOLTAR \n";
+                        code+="   MACRO_SOLTAR \n";
                     }else{
                         cuidameloTantito+="   MACRO_SOLTAR \n";
+                        proc+="   MACRO_SOLTAR \n";
                     }
                 }else if(sentencia.startsWith("LIMPIAR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_LIMPIAR \n";
+                        code+="   MACRO_LIMPIAR \n";
                     }else{
                         cuidameloTantito+="   MACRO_LIMPIAR \n";
+                        proc+="   MACRO_LIMPIAR \n";
                     }
                 }else if(sentencia.startsWith("APAGAR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_APAGAR \n";
+                        code+="   MACRO_APAGAR \n";
                     }else{
                         cuidameloTantito+="   MACRO_APAGAR \n";
+                        proc+="   MACRO_APAGAR \n";
                     }
                 }else if(sentencia.startsWith("CAJA")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_CAJA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MACRO_CAJA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito+="   MACRO_CAJA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc+="   MACRO_CAJA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                 }
                 
-                
             }//For de las sentencias
-            //codigoIntermedio+="\n";
-            //cuidameloTantito+="\n";
+            
         }//bloques de codigo
-        
         
     }//FINAL DE LA GENERACION de CodigoINtermedio
 
+    //generar el asm
+    private void averQPedo(){
+        try {
+            //System.out.println("ventana: "+this.getTitle());
+            String tit = this.getTitle();
+            tit = tit.substring(0, tit.indexOf("."));
+            String ruta = "C:\\Users\\yvano\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\"+tit+".asm";
+            File file = new File(ruta);
+            
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            
+            FileWriter fw = new FileWriter(file);
+            try (BufferedWriter bw = new BufferedWriter(fw)) {
+                bw.write(data);
+            }
+            
+            System.out.println("Archivo creado: " + file.getName());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error.");
+            //e.printStackTrace();
+        }
+    }//FIN AQP
+    
     private void cambioColor() {
         /* Limpiar el arreglo de colores */
         textocolor.clear();
@@ -2546,6 +2743,7 @@ public class Compilador extends javax.swing.JFrame {
     private javax.swing.JButton btnAbrir;
     private javax.swing.JButton btnCodInt;
     private javax.swing.JButton btnCompilar;
+    private javax.swing.JButton btnEjecutar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnGuardarC;
     private javax.swing.JButton btnNuevo;

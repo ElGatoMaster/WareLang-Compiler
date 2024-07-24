@@ -1,3 +1,5 @@
+import javax.swing.JTextArea;
+
 
 
 /**
@@ -18,6 +20,10 @@ public class codigoIntermedio extends javax.swing.JDialog {
     
     public void setEnsamblador(String emu){
         txtCodEmu.setText(emu);
+    }
+    
+    public JTextArea getEmu(){
+        return txtCodEmu;
     }
     
     @SuppressWarnings("unchecked")
