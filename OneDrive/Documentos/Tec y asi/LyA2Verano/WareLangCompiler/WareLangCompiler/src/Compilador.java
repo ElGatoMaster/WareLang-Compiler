@@ -1998,7 +1998,7 @@ public class Compilador extends javax.swing.JFrame {
         
     }//FIN SEMANTICO
     
-    int cLBL=1;
+    int cLBL=1;int ccc=0;
     //Variables a usar: codigoIntermedio y cuidameloTantito
     //Para controlar donde van las sentencias, o dentro de q nivel, propongo usar la variable control, posibles valores 1 y 2
     private void generarCodigoIntermedio(ArrayList<String> codigoDiv, int control){
@@ -2016,21 +2016,359 @@ public class Compilador extends javax.swing.JFrame {
                 sentencia = sentencia.trim(); //quitar los espacios al inicio y al final pq luego no lo detecta
                 if (sentencia.startsWith("CLASE")) {
                     codigoIntermedio += "INICIO: \n";
-                    data+=".model small\n.stack\n.data\n";
+                    data+="#start=robot.exe# \n" +
+                          "#start=stepper_motor.exe#\n"
+                         +".model small\n.stack\n.data\n"
+                         +"      MATRIZ DB 11111111B, 11111111B , 11111111B, 11111111B,11111111B ;2000H - 2004H   DISPLAY 1\n" +
+                          "             DB 00000000B, 00000000B,  00000000B, 00000000B,00000000B ;2005H - 2009H   DISPLAY 2\n" +
+                          "             DB 00000000B, 00111100B,  00010010B, 00111100B,00000000B ;200AH - 200EH   DISPLAY 3\n" +
+                          "             DB 00000000B, 00111110B,  00100000B, 00100000B,00000000B ;200FH - 2013H   DISPLAY 4\n" +
+                          "             DB 00000000B, 00000010B,  00111110B, 00000010B,00000000B ;2014H - 2018H   DISPLAY 5\n" +
+                          "             DB 00000000B, 00111110B,  00100010B, 00111110B,00000000B ;2019H - 201DH   DISPLAY 6 \n" +
+                          "             DB 00000000B, 00000000B,  00000000B, 00000000B,00000000B ;201EH - 2022H   DISPLAY 7\n" +
+                          "             DB 11111111B, 11111111B , 11111111B, 11111111B,11111111B ;2023H - 2027H \n" +
+                          "             \n" +
+                          "      BEP    Db 007      \n" +
+                          "             \n" +
+                          "      VUELTA   DB 0000_0110b\n" +
+                          "               DB 0000_0100b    \n" +
+                          "               DB 0000_0011b\n" +
+                          "               DB 0000_0010b\n" +
+                          "               \n" +
+                          "      VUELTAINV  DB 0000_0011b\n" +
+                          "                 DB 0000_0001b    \n" +
+                          "                 DB 0000_0110b\n" +
+                          "                 DB 0000_0010b \n" +
+                          "                 \n" +
+                          "      CADIMPR    DB '$'\n" +
+                          "      ACUMCAR    DW 0\n" +
+                          " \n" +
+                          "               \n" +
+                          "      FINVUELTA = 8h\n" +
+                          "      \n" +
+                          "      r_port equ 9  \n" +
+                          "      \n" +
+                          "      ESPACIOS DW 0 \n";
+                    proc+=" ;----- ALARMA -----\n" 
+                            + "ALARMA proc\n"
+                            + "       mov ah,9\n"
+                            + "       mov al,007h    \n"
+                            + "       mov cx,3 \n"
+                            + "       int 10h\n"
+                            + "              \n"
+                            + "       MOV DX, 2000H \n"
+                            + "       MOV BX, 0        \n"
+                            + "DISPLAY:\n"
+                            + "        \n"
+                            + "       MOV CX, 5\n"
+                            + "       MOV SI, 0         \n"
+                            + "\n"
+                            + "COLUMNA:\n"
+                            + "       \n"
+                            + "       MOV AL, MATRIZ[BX][SI]\n"
+                            + "       OUT DX, AL \n"
+                            + "       INC SI\n"
+                            + "       INC DX \n"
+                            + "         \n"
+                            + "       CMP SI, 5\n"
+                            + "       LOOPNE COLUMNA \n"
+                            + "       \n"
+                            + "       ADD BX,5 \n"
+                            + "       CMP BX,40 \n"
+                            + "        \n"
+                            + "       \n"
+                            + "       JL DISPLAY\n"
+                            + "                     \n"
+                            + "RET  \n"
+                            + "ALARMA endp\n"
+                            + "\n"
+                            + "\n"
+                            + "\n"
+                            + "  ; ----- TOMAR -----\n"
+                            + "TOMAR proc \n"
+                            + "        \n"
+                            + "IniciarRueda:\n"
+                            + "mov bx, offset VUELTA \n"
+                            + "mov si, 0\n"
+                            + "mov cx, 0 \n"
+                            + "\n"
+                            + "darVuelta:\n"
+                            + "\n"
+                            + "espera: in al, 7     \n"
+                            + "        test al, 10000000b\n"
+                            + "        jz espera\n"
+                            + "\n"
+                            + "mov al, [bx][si]\n"
+                            + "out 7, al\n"
+                            + "\n"
+                            + "inc si\n"
+                            + "\n"
+                            + "cmp si, 4\n"
+                            + "jb darVuelta\n"
+                            + "mov si, 0\n"
+                            + " \n"
+                            + "\n"
+                            + "inc cx\n"
+                            + "cmp cx, FINVUELTA\n"
+                            + "jb  darVuelta \n"
+                            + "\n"
+                            + ";apagar luz\n"
+                            + "mov al, 6\n"
+                            + "out r_port, al\n"
+                            + "ret\n"
+                            + "\n"
+                            + "RET\n"
+                            + "\n"
+                            + "TOMAR endp  \n"
+                            + "\n"
+                            + "\n"
+                            + "\n"
+                            + "  ; ----- SOLTAR -----\n"
+                            + "SOLTAR proc \n"
+                            + "        \n"
+                            + "IniciarRuedaS:\n"
+                            + "mov bx, offset VUELTAINV \n"
+                            + "mov si, 0\n"
+                            + "mov cx, 0 \n"
+                            + "\n"
+                            + "darVueltaS:\n"
+                            + "\n"
+                            + "esperaS: in al, 7     \n"
+                            + "        test al, 10000000b\n"
+                            + "        jz esperaS\n"
+                            + "\n"
+                            + "mov al, [bx][si]\n"
+                            + "out 7, al\n"
+                            + "\n"
+                            + "inc si\n"
+                            + "\n"
+                            + "cmp si, 4\n"
+                            + "jb darVueltaS\n"
+                            + "mov si, 0\n"
+                            + " \n"
+                            + "\n"
+                            + "inc cx\n"
+                            + "cmp cx, FINVUELTA\n"
+                            + "jb  darVueltaS \n"
+                            + "\n"
+                            + ";prender luz\n"
+                            + "mov al, 5\n"
+                            + "out r_port, al\n"
+                            + "\n"
+                            + "RET\n"
+                            + "\n"
+                            + "SOLTAR endp\n"
+                            + " \n"
+                            + "       \n"
+                            + "\n"
+                            + " ;----- VER ----\n"
+                            + "VER proc \n"
+                            + "\n"
+                            + "call enfriar \n"
+                            + "    \n"
+                            + "mov al, 4\n"
+                            + "out r_port, al ;EXAMINA\n"
+                            + "        \n"
+                            + "ocupado: in al, r_port+2\n"
+                            + "       test al, 00000001b\n"
+                            + "       jz ocupado\n"
+                            + "\n"
+                            + "RET\n"
+                            + "\n"
+                            + "VER endp \n"
+                            + "\n"
+                            + "\n"
+                            + "\n"
+                            + " ; ---- IZQUIERDA ----\n"
+                            + "IZQUIERDA proc  \n"
+                            + "    CALL ENFRIAR\n"
+                            + "    \n"
+                            + "    MOV AL, 2\n"
+                            + "    OUT 9, AL \n"
+                            + "    \n"
+                            + "    MOV CX,ESPACIOS  \n"
+                            + "CICLOIZ:\n"
+                            + "    CALL ENFRIAR\n"
+                            + "     \n"
+                            + "    mov al, 0\n"
+                            + "    out r_port, al \n"
+                            + "    \n"
+                            + "    CALL ENFRIAR \n"
+                            + "    \n"
+                            + "    mov al, 1\n"
+                            + "    out r_port, al \n"
+                            + "    \n"
+                            + "    CALL ENFRIAR  \n"
+                            + "    \n"
+                            + "    LOOP CICLOIZ\n"
+                            + "\n"
+                            + "RET\n"
+                            + "\n"
+                            + "IZQUIERDA endp\n"
+                            + "\n"
+                            + "  \n"
+                            + "  \n"
+                            + "  \n"
+                            + "  \n"
+                            + " ; ---- DERECHA ----\n"
+                            + "DERECHA proc\n"
+                            + "    CALL ENFRIAR\n"
+                            + "    \n"
+                            + "    MOV AL, 3\n"
+                            + "    OUT 9, AL \n"
+                            + "    \n"
+                            + "    MOV CX,ESPACIOS  \n"
+                            + "CICLODER: \n"
+                            + "    CALL ENFRIAR\n"
+                            + "     \n"
+                            + "    mov al, 0\n"
+                            + "    out r_port, al\n"
+                            + "    \n"
+                            + "    CALL ENFRIAR  \n"
+                            + "    \n"
+                            + "    mov al, 1\n"
+                            + "    out r_port, al\n"
+                            + "    \n"
+                            + "    CALL ENFRIAR\n"
+                            + "\n"
+                            + "    LOOP CICLODER\n"
+                            + "\n"
+                            + "RET\n"
+                            + "\n"
+                            + "DERECHA endp   \n"
+                            + "\n"
+                            + "\n"
+                            + "\n"
+                            + " ; ---- ADELANTE ----\n"
+                            + "ADELANTE proc \n"
+                            + "    CALL ENFRIAR  \n"
+                            + "    \n"
+                            + "    MOV CX,ESPACIOS  \n"
+                            + "CICLOADEL:\n"
+                            + "    CALL ENFRIAR\n"
+                            + "    \n"
+                            + "    mov al, 0\n"
+                            + "    out r_port, al\n"
+                            + "    \n"
+                            + "    CALL ENFRIAR  \n"
+                            + "    \n"
+                            + "    mov al, 1\n"
+                            + "    out r_port, al\n"
+                            + "    \n"
+                            + "    CALL ENFRIAR\n"
+                            + "\n"
+                            + "    LOOP CICLOADEL\n"
+                            + "\n"
+                            + "RET\n"
+                            + "\n"
+                            + "ADELANTE endp \n"
+                            + "\n"
+                            + "\n"
+                            + "; ---- ATRAS ----\n"
+                            + " ATRAS proc   \n"
+                            + "    CALL ENFRIAR \n"
+                            + "    \n"
+                            + "    MOV AL, 3\n"
+                            + "    OUT 9, AL \n"
+                            + "    \n"
+                            + "    CALL ENFRIAR\n"
+                            + "    \n"
+                            + "    mov al, 0\n"
+                            + "    out r_port, al\n"
+                            + "    \n"
+                            + "    CALL ENFRIAR \n"
+                            + "    \n"
+                            + "    MOV AL, 3\n"
+                            + "    OUT 9, AL    \n"
+                            + "    \n"
+                            + "    MOV CX,ESPACIOS  \n"
+                            + "CICLOAT: \n"
+                            + "    CALL ENFRIAR \n"
+                            + "    \n"
+                            + "    mov al, 0\n"
+                            + "    out r_port, al  \n"
+                            + "    \n"
+                            + "    CALL ENFRIAR\n"
+                            + "    \n"
+                            + "    mov al, 1\n"
+                            + "    out r_port, al\n"
+                            + "    \n"
+                            + "    CALL ENFRIAR\n"
+                            + "     \n"
+                            + "    LOOP CICLOAT\n"
+                            + "\n"
+                            + "RET\n"
+                            + "\n"
+                            + "ATRAS endp\n"
+                            + "\n"
+                            + "\n"
+                            + "  ; ---- PARAR ----\n"
+                            + "PARAR proc\n"
+                            + "  mov al, 0\n"
+                            + "  out r_port, al \n"
+                            + "    \n"
+                            + "ret    \n"
+                            + "PARAR  endp \n"
+                            + "\n"
+                            + "   ;----- ENFRIAR -----\n"
+                            + " \n"
+                            + "ENFRIAR proc\n"
+                            + "busy: in al, r_port+2\n"
+                            + "      test al, 00000010b\n"
+                            + "      jnz busy ; busy, so wait.\n"
+                            + "ret     \n"
+                            + "ENFRIAR endp   \n"
+                            + "\n"
+                            + "\n"
+                            + "  ; ---- IMPRIMIRLCD ----\n"
+                            + "IMPRIMIR_LCD proc \n"
+                            + "     MOV ACUMCAR, 0\n"
+                            + "     MOV AX,0\n"
+                            + " \n"
+                            + "     \n"
+                            + "     MOV DX, 2050h\n"
+                            + "	 MOV SI, 0\n"
+                            + "     MOV CX, 15 \n"
+                            + "     \n"
+                            + "LOOPLCD:\n"
+                            + "	MOV AL, CADIMPR[SI]\n"
+                            + "	CMP AL, '$'\n"
+                            + "	JE SALIR\n"
+                            + "	OUT DX,AL \n"
+                            + "	INC SI\n"
+                            + "	INC DX\n"
+                            + "\n"
+                            + "	LOOP LOOPLCD \n"
+                            + "	\n"
+                            + "SALIR:\n"
+                            + "RET \n"
+                            + "          \n"
+                            + "IMPRIMIR_LCD  endp\n"
+                            + "\n"
+                            + "\n"
+                            + "  ; ---- IMPRIMIRCONSOLA ----\n"
+                            + "IMPRIMIR_CONSOLA proc \n"
+                            + "    MOV AH,9\n"
+                            + "    LEA DX,CADIMPR\n"
+                            + "    INT 21H\n"
+                            + "RET \n"
+                            + "          \n"
+                            + "IMPRIMIR_CONSOLA  endp\n\n";
                 } else if (sentencia.startsWith("CONF")) {
                     String s[] = sentencia.split(" "); //conf td id *opas* *val*
                     if (s.length > 3 ) {
                         //codigoIntermedio += "   "+s[2] + " = " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
                         switch (s[1]) {
-                            case "BOOL" -> data+="   "+s[2] + " dw '" + s[4].charAt(0) + "'\n";
-                            case "COLOR" -> data+="   "+s[2] + " dw '"+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length())+"'\n";
+                            case "BOOL" -> data+="   "+s[2] + " dw '" + s[4].charAt(0) + "$'\n";
+                            case "COLOR" -> data+="   "+s[2] + " dw '"+sentencia.substring(sentencia.indexOf(s[4]),sentencia.length())+"$'\n";
+                            case "CAD" -> data+="   "+s[2]+" db "+sentencia.substring(sentencia.indexOf(s[4]),sentencia.lastIndexOf("'"))+"$'\n";
                             default -> data+="   "+s[2] + " dw " + sentencia.substring(sentencia.indexOf(s[4]),sentencia.length()) + "\n";
                         }
                     } else {
                         switch (s[1]) {
                             case "CAD" -> {
                                 codigoIntermedio += "   "+s[2] + " = '' \n";
-                                data += "   "+s[2] + " dw '' \n";
+                                data += "   "+s[2] + " db '' \n";
                             }
                             case "FREC" -> {
                                 codigoIntermedio += "   "+s[2] + " = 20 \n";
@@ -2084,13 +2422,13 @@ public class Compilador extends javax.swing.JFrame {
                         break;
                     } else {
                         cuidameloTantito += "PROC "+s[1]+":\n";
-                        proc+="PROC "+s[1]+":\n";
+                        proc+=s[1]+" PROC \n";
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), 2);
                         x=pos[1];
                         cuidameloTantito += "FIN PROC\n\n";
                         proc+="   RET\n"
-                            +"ENDP \n\n";
+                            +s[1]+" ENDP \n\n";
                         break;
                     }
 
@@ -2158,17 +2496,16 @@ public class Compilador extends javax.swing.JFrame {
                         String s[] = sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
                         System.out.println(Arrays.toString(s));
                         if(s[0].equals("REVISAR")){//REVUISAr ( 1 , 2 ) op valor
-                            emu+="   MACRO_REVISAR "+s[2]+s[3]+s[4]+"\n";
-                            emu+="   MOV BX, '"+s[s.length-1].charAt(0)+"' \n";
-                            emu+="   CMP AX,BX\n";
-                            emu+="   JE LBL"+(cLBL)+"\n";
-                            emu+="   JMP LBL"+(cLBL+1)+"\n";
+                            emu+="   call VER \n" +
+                                 "   in al, r_port + 1  \n"
+                               + "   cmp al, 7\n"
+                               + "   JNZ LBL"+(cLBL+1)+"\n";
+                            
                         }else if(s[0].startsWith("VER")){
-                            emu+="   MACRO_"+s[0]+"\n";
-                            emu+="   MOV BX, '"+s[s.length-1].charAt(0)+"' \n";
-                            emu+="   CMP AX,BX\n";
-                            emu+="   JE LBL"+(cLBL)+"\n";
-                            emu+="   JMP LBL"+(cLBL+1)+"\n";
+                            emu+="call VER            \n"
+                               + "   in al, r_port + 1  \n"
+                               + "   cmp al, 255  \n"
+                               + "   JE LBL"+(cLBL+1)+"\n";
                         }else{
                             emu+="   MOV AX, "+s[0]+"\n";
                             if(s[s.length-1].equals("VERDAERO") || s[s.length-1].equals("FALSO"))
@@ -2219,7 +2556,7 @@ public class Compilador extends javax.swing.JFrame {
                         x=pos[1];
                         if(sentencia.startsWith("SINO")){
                             codigoIntermedio+="LBL"+(++cLBL)+": \n";
-                            code+="LBL"+(cLBL)+":\n";
+                            code+="LBL"+(cLBL++)+":\n";
                         }
                         //codigoIntermedio+="\n";
                         break;
@@ -2231,7 +2568,7 @@ public class Compilador extends javax.swing.JFrame {
                         x=pos[1];
                         if(sentencia.startsWith("SINO")){
                             cuidameloTantito+="LBL"+(++cLBL)+": \n";
-                            proc+="LBL"+cLBL+":\n";
+                            proc+="LBL"+(cLBL++)+":\n";
                         }
                         break;
                     }
@@ -2247,17 +2584,15 @@ public class Compilador extends javax.swing.JFrame {
                         String[] cmp = sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
                         System.out.println(Arrays.toString(cmp));
                         if(cmp[0].equals("REVISAR")){//REVUISAr ( 1 , 2 ) op valor
-                            code+="   MACRO_REVISAR "+cmp[2]+cmp[3]+cmp[4]+"\n";
-                            code+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
-                            code+="   CMP AX,BX\n";
-                            code+="   JE LBL"+(cLBL)+"\n";
-                            code+="   JMP LBL"+(cLBL+1)+"\n";
+                            code+="   call VER \n" +
+                                 "   in al, r_port + 1  \n"
+                               + "   cmp al, 7\n"
+                               + "   JNZ LBL"+(cLBL+1)+"\n";
                         }else if(cmp[0].startsWith("VER")){
-                            code+="   MACRO_"+cmp[0]+"\n";
-                            code+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
-                            code+="   CMP AX,BX\n";
-                            code+="   JE LBL"+(cLBL)+"\n";
-                            code+="   JMP LBL"+(cLBL+1)+"\n";
+                            code+="call VER            \n"
+                               + "   in al, r_port + 1  \n"
+                               + "   cmp al, 255  \n"
+                               + "   JE LBL"+(cLBL+1)+"\n";
                         }else{
                             code+="   MOV AX, "+cmp[0]+"\n";
                             if(cmp[cmp.length-1].equals("VERDAERO") || cmp[cmp.length-1].equals("FALSO"))
@@ -2302,7 +2637,6 @@ public class Compilador extends javax.swing.JFrame {
                         x=pos[1];
                         codigoIntermedio+=" goto LBL"+sp+"\n"+"LBL"+(++cLBL)+":\n";
                         code+="   JMP LBL"+sp+"\n"+ "LBL"+(cLBL)+":\n";
-                        
                         break;
                     }else{//IF DEL CONTROL
                         cuidameloTantito+="LBL"+cLBL+":\n";sp=cLBL;
@@ -2313,15 +2647,15 @@ public class Compilador extends javax.swing.JFrame {
                         String[] cmp = sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
                         System.out.println(Arrays.toString(cmp));
                         if(cmp[0].equals("REVISAR")){//REVUISAr ( 1 , 2 ) op valor
-                            proc+="   MACRO_REVISAR "+cmp[2]+cmp[3]+cmp[4]+"\n";
-                            proc+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
-                            proc+="   CMP AX,BX\n";
-                            proc+="   JE LBL"+(cLBL)+"\n";
+                            proc+="call VER            \n"
+                               + "   in al, r_port + 1  \n"
+                               + "   cmp al, 255  \n"
+                               + "   JNZ LBL"+(cLBL+1)+"\n";
                         }else if(cmp[0].startsWith("VER")){
-                            proc+="   MACRO_"+cmp[0]+"\n";
-                            proc+="   MOV BX, '"+cmp[cmp.length-1].charAt(0)+"' \n";
-                            proc+="   CMP AX,BX\n";
-                            proc+="   JE LBL"+(cLBL)+"\n";
+                            proc+="call VER            \n"
+                               + "   in al, r_port + 1  \n"
+                               + "   cmp al, 7  \n"
+                               + "   JNZ LBL"+(cLBL+1)+"\n";
                         }else{
                             proc+="   MOV AX, "+cmp[0]+"\n";
                             if(cmp[cmp.length-1].equals("VERDAERO") || cmp[cmp.length-1].equals("FALSO"))
@@ -2398,55 +2732,63 @@ public class Compilador extends javax.swing.JFrame {
                 } else if (sentencia.startsWith("ADELANTE")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        code+="   CALL ADELANTE \n";
                     }else{
                         cuidameloTantito += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc += "   MACRO_ADELANTE "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        proc+="   CALL ADELANTE \n";
                     }
                     
                 } else if (sentencia.startsWith("ATRAS")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        code+="   CALL ATRAS \n";
                     }else{
                         cuidameloTantito += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc += "   MACRO_ATRAS "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        proc+="   CALL ATRAS \n";
                     }
                     
                 } else if (sentencia.startsWith("IZQUIERDA")) {
                     if(control==1){
                         codigoIntermedio +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        code+="   CALL IZQUIERDA \n";
                     }else{
                         cuidameloTantito +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc +="   MACRO_IZQUIERDA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        proc+="   CALL IZQUIERDA \n";
                     }
                     
                 } else if (sentencia.startsWith("DERECHA")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        code+="   CALL DERECHA \n";
                     }else{
                         cuidameloTantito += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc += "   MACRO_DERECHA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   MOV ESPACIOS, "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" ,"))+"\n";
+                        proc+="   CALL DERECHA \n";
                     }
                     
                 } else if (sentencia.startsWith("PARAR")) {
                     if(control==1){
                         codigoIntermedio += "   MACRO_PARAR\n";
-                        code += "   MACRO_PARAR\n";
+                        code += "   CALL PARAR\n";
                     }else{
                         cuidameloTantito += "   MACRO_PARAR\n";
-                        proc += "   MACRO_PARAR\n";
+                        proc += "   CALL PARAR\n";
                     }
                     
                 } else if (sentencia.startsWith("REVISAR")) {
                     if(control==1){
                         codigoIntermedio +="   MACRO_REVISAR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code +="   MACRO_REVISAR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code +="   CALL VER  \n";
                     }else{
                         cuidameloTantito += "   MACRO_REVISAR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc += "   MACRO_REVISAR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc += "   CALL VER  \n";
                     }
                     
                 }else if(sentencia.startsWith("IMPRVECTOR")){
@@ -2460,65 +2802,69 @@ public class Compilador extends javax.swing.JFrame {
                 }else if(sentencia.startsWith("IMPR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_IMPR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code+="   MACRO_IMPR"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        String s[]=sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
+                        if(s[0].startsWith("'")){
+                                data+="\n   cadz"+(ccc)+" db "+s[0].substring(0, s[0].length()-1)+"$'\n";
+                                code+="   MOV al, cadz" + (ccc++) + "\n";
+                                code += "   MOV CADIMPR, al \n";
+                            }else{
+                                code+="   MOV al, "+ s[0] + "\n";
+                                code+="   MOV CADIMPR, al \n" ;
+                            }
+                        if(s[2].equals("LCD")){
+                            code += "   CALL IMPRIMIR_LCD \n";
+                        }else{
+                            code += "   CALL IMPRIMIR_CONSOLA\n";
+                        }
                     }else{
                         cuidameloTantito+="   MACRO_IMPR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc+="   MACRO_IMPR "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        String s[]=sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
+                        if(s[0].startsWith("'")){
+                                data+="\n   cadz"+(ccc)+" db "+s[0].substring(0, s[0].length()-1)+"$'\n";
+                                proc+="   MOV al, cadz" + (ccc++) + "\n";
+                                proc += "   MOV CADIMPR, al \n";
+                            }else{
+                                proc+="   MOV al, "+ s[0] + "\n";
+                                proc += "   MOV CADIMPR, al \n";
+                                
+                            }
+                        if(s[2].equals("LCD")){
+                            proc += "   CALL IMPRIMIR_LCD \n";
+                        }else{
+                            proc += "   CALL IMPRIMIR_CONSOLA\n";
+                        }
                     }
                 }else if(sentencia.startsWith("ALARMA")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_ALARMA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code+="   MACRO_ALARMA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        code+="   CALL ALARMA \n";
                     }else{
                         cuidameloTantito+="   MACRO_ALARMA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc+="   MACRO_ALARMA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        proc+="   CALL ALARMA \n";
                     }
-                }else if(sentencia.startsWith("PRENDER")){
-                    if(control==1){
-                        codigoIntermedio+="   MACRO_PRENDER \n";
-                        code+="   MACRO_PRENDER \n";
-                    }else{
-                        proc+="   MACRO_PRENDER \n";
-                    }
-                }else if(sentencia.startsWith("PRENDER")){
+                }else if(sentencia.startsWith("TOMAR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_TOMAR \n";
-                        code+="   MACRO_TOMAR \n";
+                        code+="   CALL TOMAR \n";
                     }else{
                         cuidameloTantito+="   MACRO_TOMAR  \n";
-                        proc+="   MACRO_TOMAR  \n";
+                        proc+="   CALL TOMAR  \n";
                     }
                 }else if(sentencia.startsWith("SOLTAR")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_SOLTAR \n";
-                        code+="   MACRO_SOLTAR \n";
+                        code+="   CALL SOLTAR \n";
                     }else{
                         cuidameloTantito+="   MACRO_SOLTAR \n";
-                        proc+="   MACRO_SOLTAR \n";
-                    }
-                }else if(sentencia.startsWith("LIMPIAR")){
-                    if(control==1){
-                        codigoIntermedio+="   MACRO_LIMPIAR \n";
-                        code+="   MACRO_LIMPIAR \n";
-                    }else{
-                        cuidameloTantito+="   MACRO_LIMPIAR \n";
-                        proc+="   MACRO_LIMPIAR \n";
-                    }
-                }else if(sentencia.startsWith("APAGAR")){
-                    if(control==1){
-                        codigoIntermedio+="   MACRO_APAGAR \n";
-                        code+="   MACRO_APAGAR \n";
-                    }else{
-                        cuidameloTantito+="   MACRO_APAGAR \n";
-                        proc+="   MACRO_APAGAR \n";
+                        proc+="   CALL SOLTAR \n";
                     }
                 }else if(sentencia.startsWith("CAJA")){
                     if(control==1){
                         codigoIntermedio+="   MACRO_CAJA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        code+="   MACRO_CAJA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        //code+="   MACRO_CAJA"+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }else{
                         cuidameloTantito+="   MACRO_CAJA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
-                        proc+="   MACRO_CAJA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
+                        //proc+="   MACRO_CAJA "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))+" \n";
                     }
                 }
                 

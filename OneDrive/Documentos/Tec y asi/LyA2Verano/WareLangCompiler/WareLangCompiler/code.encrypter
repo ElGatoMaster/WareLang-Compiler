@@ -6,19 +6,18 @@ CONF CAD cajaVacia = 'Caja vacia';
 CONF CAD cajaLlena = 'Producto tomado';
 CONF FREC alarm = 20;
 CONF MINI x = 1;
-VECT CAD buscados = ['Zucaritas','Pan Bimbo','Canelitas'];
-VECT CAD estado [3];
+
 
 
 DEF tomarHay(){
-     SI(REVISAR(#70FF00,12)==FALSO){
+     SI(REVISAR(#70FF00,12)==VERDADERO){
       TOMAR();
-      IMPR('C',LCD);
-      estado[x]='Lleno' ;
+      IMPR('LLENO',LCD);
+      
    }SINO{
-      IMPR('',LCD);
+      IMPR('VACIO',LCD);
       ALARMA(alarm);
-      estado[1]='Vacío' ;
+      
    }
 
 }
@@ -26,7 +25,6 @@ DEF tomarHay(){
 
 //DECLARACION METODOS
 DEF recorridoZucaritas(){
-REPETIR(3){
    SI(VERADELANTE()==VERDADERO){
       ADELANTE(1,2);
    }SINO{
@@ -34,12 +32,9 @@ REPETIR(3){
       IMPR('obstruccion',LCD);
 
    }
- }
-
 }
 
 DEF recorridoPan(){
- REPETIR(2){
    SI(VERDERECHA()==VERDADERO){
       DERECHA(1,2);
    }SINO{
@@ -47,12 +42,10 @@ DEF recorridoPan(){
       IMPR('obstruccion',LCD);
 
    }
- }
 
 }
 
 DEF recorridoCanelitas(){
- REPETIR(4){
    SI(VERDERECHA()==VERDADERO){
       ATRAS(1,2);
    }SINO{
@@ -60,25 +53,21 @@ DEF recorridoCanelitas(){
       IMPR('obstruccion',LCD);
 
    }
- }
 
 }
 
 DEF principal(){
    recorridoZucaritas();
    tomarHay();  
-   x+=1;
+   //x+=1;
    recorridoPan();
    tomarHay();  
-   x+=1;
+   //x+=1;
    recorridoCanelitas();
    tomarHay();  
-   //IMPRVECTOR(buscados,3); 
-   //IMPRVECTOR(estado,3); 
-   MIENTRAS(x<6){
-      IMPR(fin,CONSOL); 
-      x+=1;
-   }
+   
+   IMPR(fin,CONSOL); 
+   //x+=1;
  }
 
 }//CLAASE
