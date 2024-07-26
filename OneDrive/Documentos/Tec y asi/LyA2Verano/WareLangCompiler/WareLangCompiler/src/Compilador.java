@@ -596,8 +596,7 @@ public class Compilador extends javax.swing.JFrame {
         //Para ejecutar la C
         String tit = this.getTitle();
         tit = tit.substring(0, tit.indexOf("."));
-        String rutaASM =  "D:\\Users\\Rebeca\\Documentos\\Lenguajes Y Automatas 2\\doce\\WareLang-Compiler"
-                + "\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\WareLangCompiler\\"+tit +".asm";
+        String rutaASM = "C:\\Users\\yvano\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\"+tit +".asm";
         File file = new File(rutaASM);
         Desktop d = Desktop.getDesktop();
         try {
@@ -2049,11 +2048,9 @@ public class Compilador extends javax.swing.JFrame {
                           "      \n" +
                           "      r_port equ 9  \n" +
                           "      \n" +
-                          "      ESPACIOS DW 0 \n";
-                          
-                    proc+=  " ;****************************** PROCEDIMIENTOS *************************** \n" 
-                            +" ;----- ALARMA -----\n" 
                           "      ESPACIOS DW 1 \n";
+                          
+                    proc+=  " ;****************************** PROCEDIMIENTOS *************************** \n";
                     proc+=" ;----- ALARMA -----\n" 
                             + "ALARMA proc\n"
                             + "       mov ah,9\n"
@@ -2889,8 +2886,7 @@ public class Compilador extends javax.swing.JFrame {
             //System.out.println("ventana: "+this.getTitle());
             String tit = this.getTitle();
             tit = tit.substring(0, tit.indexOf("."));
-            String ruta = "D:\\Users\\Rebeca\\Documentos\\Lenguajes Y Automatas 2\\doce\\WareLang-Compiler"
-                + "\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\WareLangCompiler\\"+tit+".asm";
+            String ruta = "C:\\Users\\yvano\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\"+tit +".asm";
             File file = new File(ruta);
             
             if (!file.exists()) {
