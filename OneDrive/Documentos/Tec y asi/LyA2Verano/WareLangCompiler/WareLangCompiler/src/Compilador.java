@@ -2493,7 +2493,7 @@ public class Compilador extends javax.swing.JFrame {
                     String emu="LBL"+(cLBL-1)+":\n";
                     if(sentencia.startsWith("SI ")){
                         local+="    if "+sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )"))
-                                +" goto LBL"+(cLBL)+"\n"+
+                               +"   goto LBL"+(cLBL)+"\n"+
                                 "   goto LBL"+(cLBL+1)+"\n";
                         String s[] = sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
                         System.out.println(Arrays.toString(s));
@@ -2502,9 +2502,8 @@ public class Compilador extends javax.swing.JFrame {
                                  "   in al, r_port + 1  \n"
                                + "   cmp al, 7\n"
                                + "   JNZ LBL"+(cLBL+1)+"\n";
-                            
                         }else if(s[0].startsWith("VER")){
-                            emu+="call VER            \n"
+                            emu+="   call VER           \n"
                                + "   in al, r_port + 1  \n"
                                + "   cmp al, 255  \n"
                                + "   JE LBL"+(cLBL+1)+"\n";
@@ -2514,7 +2513,7 @@ public class Compilador extends javax.swing.JFrame {
                                 emu+="   MOV BX, "+s[s.length-1].charAt(0)+"\n";
                             else
                                 emu+="   MOV BX, "+s[s.length-1]+"\n";
-                            emu+="   CMP AX,BX \n";
+                                emu+="   CMP AX,BX \n";
                             switch (s[1]) {
                                 case "==" -> {
                                     emu+="   JE LBL"+(cLBL)+"\n";
@@ -2556,9 +2555,10 @@ public class Compilador extends javax.swing.JFrame {
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        codigoIntermedio+="LBL"+(++cLBL)+": \n";
-                        code+="LBL"+(cLBL++)+":\n";
-                        //codigoIntermedio+="\n";
+                        if(sentencia.startsWith("SINO")){
+                            codigoIntermedio += "LBL" + (++cLBL) + ": \n";
+                            code += "LBL" + (cLBL++) + ":\n";
+                        }
                         break;
                     }else{
                         cuidameloTantito += local +"LBL"+(cLBL)+":\n";
@@ -2566,8 +2566,10 @@ public class Compilador extends javax.swing.JFrame {
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        cuidameloTantito += "LBL" + (++cLBL) + ": \n";
-                        proc += "LBL" + (cLBL++) + ":\n";
+                        if(sentencia.startsWith("SINO")){
+                            cuidameloTantito += "LBL" + (++cLBL) + ": \n";
+                            proc += "LBL" + (cLBL++) + ":\n";
+                        }
                         break;
                     }
                     
@@ -2808,7 +2810,7 @@ public class Compilador extends javax.swing.JFrame {
                                         + "MOV CX, 8 \n"
                                         + "REP MOVSB\n";
                             }else{
-                                code+="   MOV SI, OFFSET"+ s[0] + "\n";
+                                code+="   MOV SI, OFFSET "+ s[0] + "\n";
                                 code+="   MOV DI, OFFSET CADIMPR \n"
                                         + "MOV CX, 8 \n"
                                         + "REP MOVSB\n";
@@ -2828,7 +2830,7 @@ public class Compilador extends javax.swing.JFrame {
                                         + "MOV CX, 8 \n"
                                         + "REP MOVSB\n";
                             }else{
-                                proc+="   MOV SI, OFFSET"+ s[0] + "\n";
+                                proc+="   MOV SI, OFFSET "+ s[0] + "\n";
                                 proc +="   MOV DI, OFFSET CADIMPR \n"
                                         + "MOV CX, 8 \n"
                                         + "REP MOVSB\n";
