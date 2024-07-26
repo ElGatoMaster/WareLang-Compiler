@@ -2053,6 +2053,8 @@ public class Compilador extends javax.swing.JFrame {
                           
                     proc+=  " ;****************************** PROCEDIMIENTOS *************************** \n" 
                             +" ;----- ALARMA -----\n" 
+                          "      ESPACIOS DW 1 \n";
+                    proc+=" ;----- ALARMA -----\n" 
                             + "ALARMA proc\n"
                             + "       mov ah,9\n"
                             + "       mov al,007h    \n"
@@ -2557,10 +2559,8 @@ public class Compilador extends javax.swing.JFrame {
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        if(sentencia.startsWith("SINO")){
-                            codigoIntermedio+="LBL"+(++cLBL)+": \n";
-                            code+="LBL"+(cLBL++)+":\n";
-                        }
+                        codigoIntermedio+="LBL"+(++cLBL)+": \n";
+                        code+="LBL"+(cLBL++)+":\n";
                         //codigoIntermedio+="\n";
                         break;
                     }else{
@@ -2569,10 +2569,8 @@ public class Compilador extends javax.swing.JFrame {
                         int[] pos = CodeBlock.getPositionOfBothMarkers(codigoDiv, codigoDiv.get(codigoDiv.indexOf(bloquesCod) + 1));
                         generarCodigoIntermedio(new ArrayList<>(codigoDiv.subList(pos[0], pos[1])), control);
                         x=pos[1];
-                        if(sentencia.startsWith("SINO")){
-                            cuidameloTantito+="LBL"+(++cLBL)+": \n";
-                            proc+="LBL"+(cLBL++)+":\n";
-                        }
+                        cuidameloTantito += "LBL" + (++cLBL) + ": \n";
+                        proc += "LBL" + (cLBL++) + ":\n";
                         break;
                     }
                     
