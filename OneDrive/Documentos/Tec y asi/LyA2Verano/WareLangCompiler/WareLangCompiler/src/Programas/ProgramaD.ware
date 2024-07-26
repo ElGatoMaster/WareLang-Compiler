@@ -14,11 +14,9 @@ DEF tomarHay(){
      SI(REVISAR(#70FF00,12)==FALSO){
       TOMAR();
       IMPR('C',LCD);
-      estado[x]='Lleno' ;
    }SINO{
-      IMPR('',LCD);
+      IMPR('t',LCD);
       ALARMA(alarm);
-      estado[1]='Vacío' ;
    }
 
 }
@@ -28,7 +26,7 @@ DEF tomarHay(){
 DEF recorridoZucaritas(){
 REPETIR(3){
    SI(VERADELANTE()==VERDADERO){
-      ADELANTE(1,2);
+      ADELANTE(4,2);
    }SINO{
       PARAR();
       IMPR('obstruccion',LCD);
@@ -41,7 +39,7 @@ REPETIR(3){
 DEF recorridoPan(){
  REPETIR(2){
    SI(VERDERECHA()==VERDADERO){
-      DERECHA(1,2);
+      IZQUIERDA(2,2);
    }SINO{
       PARAR();
       IMPR('obstruccion',LCD);
@@ -54,7 +52,7 @@ DEF recorridoPan(){
 DEF recorridoCanelitas(){
  REPETIR(4){
    SI(VERDERECHA()==VERDADERO){
-      ATRAS(1,2);
+      DERECHA(2,2);
    }SINO{
       PARAR();
       IMPR('obstruccion',LCD);
@@ -67,18 +65,11 @@ DEF recorridoCanelitas(){
 DEF principal(){
    recorridoZucaritas();
    tomarHay();  
-   x+=1;
    recorridoPan();
    tomarHay();  
-   x+=1;
    recorridoCanelitas();
-   tomarHay();  
-   //IMPRVECTOR(buscados,3); 
-   //IMPRVECTOR(estado,3); 
-   MIENTRAS(x<6){
-      IMPR(fin,CONSOL); 
-      x+=1;
-   }
+   tomarHay();   
+
  }
 
 }//CLAASE

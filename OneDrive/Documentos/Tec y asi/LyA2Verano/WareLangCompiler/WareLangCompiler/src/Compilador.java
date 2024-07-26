@@ -593,10 +593,11 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCodIntActionPerformed
 
     private void btnEjecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEjecutarActionPerformed
-        //Para ejecutar la CHINGADERA
+        //Para ejecutar la C
         String tit = this.getTitle();
         tit = tit.substring(0, tit.indexOf("."));
-        String rutaASM = "C:\\Users\\yvano\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\"+tit +".asm";
+        String rutaASM =  "D:\\Users\\Rebeca\\Documentos\\Lenguajes Y Automatas 2\\doce\\WareLang-Compiler"
+                + "\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\WareLangCompiler\\"+tit +".asm";
         File file = new File(rutaASM);
         Desktop d = Desktop.getDesktop();
         try {
@@ -965,7 +966,7 @@ public class Compilador extends javax.swing.JFrame {
                 
        
     //**********************************METODOS IMPRM  ***********************
-        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor | Numero | Identificador |Expresion) Coma (Valor| Numero | Identificador|Expresion|OpImpr) Par_cer", FuncionImprimir);
+        gramatica.group("EstImpr", "F_IMPR Par_abr (Valor | Numero | Identificador |Expresion) Coma (Valor| Numero | Identificador|Expresion|OpImpr | ERROR_7| ERROR|ERROR_1) Par_cer", FuncionImprimir);
         
         gramatica.group("EstImpr", "F_IMPR ",19,
                 "Error sintáctico (19): En la línea #, Estructura inválida del método.");
@@ -2049,7 +2050,9 @@ public class Compilador extends javax.swing.JFrame {
                           "      r_port equ 9  \n" +
                           "      \n" +
                           "      ESPACIOS DW 0 \n";
-                    proc+=" ;----- ALARMA -----\n" 
+                          
+                    proc+=  " ;****************************** PROCEDIMIENTOS *************************** \n" 
+                            +" ;----- ALARMA -----\n" 
                             + "ALARMA proc\n"
                             + "       mov ah,9\n"
                             + "       mov al,007h    \n"
@@ -2805,11 +2808,15 @@ public class Compilador extends javax.swing.JFrame {
                         String s[]=sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
                         if(s[0].startsWith("'")){
                                 data+="\n   cadz"+(ccc)+" db "+s[0].substring(0, s[0].length()-1)+"$'\n";
-                                code+="   MOV al, cadz" + (ccc++) + "\n";
-                                code += "   MOV CADIMPR, al \n";
+                                code+="   MOV SI, OFFSET cadz" + (ccc++) + "\n";
+                                code += " MOV DI, OFFSET CADIMPR \n"
+                                        + "MOV CX, 8 \n"
+                                        + "REP MOVSB\n";
                             }else{
-                                code+="   MOV al, "+ s[0] + "\n";
-                                code+="   MOV CADIMPR, al \n" ;
+                                code+="   MOV SI, OFFSET"+ s[0] + "\n";
+                                code+="   MOV DI, OFFSET CADIMPR \n"
+                                        + "MOV CX, 8 \n"
+                                        + "REP MOVSB\n";
                             }
                         if(s[2].equals("LCD")){
                             code += "   CALL IMPRIMIR_LCD \n";
@@ -2821,11 +2828,15 @@ public class Compilador extends javax.swing.JFrame {
                         String s[]=sentencia.substring(sentencia.indexOf(" (")+2,sentencia.lastIndexOf(" )")).trim().split(" ");
                         if(s[0].startsWith("'")){
                                 data+="\n   cadz"+(ccc)+" db "+s[0].substring(0, s[0].length()-1)+"$'\n";
-                                proc+="   MOV al, cadz" + (ccc++) + "\n";
-                                proc += "   MOV CADIMPR, al \n";
+                                proc+="   MOV SI, OFFSET cadz" + (ccc++) + "\n";
+                                proc += " MOV DI, OFFSET CADIMPR \n"
+                                        + "MOV CX, 8 \n"
+                                        + "REP MOVSB\n";
                             }else{
-                                proc+="   MOV al, "+ s[0] + "\n";
-                                proc += "   MOV CADIMPR, al \n";
+                                proc+="   MOV SI, OFFSET"+ s[0] + "\n";
+                                proc +="   MOV DI, OFFSET CADIMPR \n"
+                                        + "MOV CX, 8 \n"
+                                        + "REP MOVSB\n";
                                 
                             }
                         if(s[2].equals("LCD")){
@@ -2880,7 +2891,8 @@ public class Compilador extends javax.swing.JFrame {
             //System.out.println("ventana: "+this.getTitle());
             String tit = this.getTitle();
             tit = tit.substring(0, tit.indexOf("."));
-            String ruta = "C:\\Users\\yvano\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\"+tit+".asm";
+            String ruta = "D:\\Users\\Rebeca\\Documentos\\Lenguajes Y Automatas 2\\doce\\WareLang-Compiler"
+                + "\\OneDrive\\Documentos\\Tec y asi\\LyA2Verano\\WareLangCompiler\\WareLangCompiler\\"+tit+".asm";
             File file = new File(ruta);
             
             if (!file.exists()) {
